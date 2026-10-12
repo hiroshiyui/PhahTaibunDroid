@@ -175,7 +175,8 @@ private fun LetterKeys(state: KeyboardState, onKey: (KeyAction) -> Unit) {
     fun label(c: Char) = if (state.shifted) c.uppercase() else c.toString()
     KeyRow {
         for ((digit, hint) in TONE_HINTS) {
-            Key(digit, hint = hint.ifEmpty { null }, function = true) { onKey(KeyAction.Digit(digit[0])) }
+            // `0` has no tone, but keeps the (empty) hint line so all digits share size and baseline.
+            Key(digit, hint = hint, function = true) { onKey(KeyAction.Digit(digit[0])) }
         }
     }
     KeyRow { "qwertyuiop".forEach { c -> Key(label(c)) { onKey(KeyAction.Letter(c)) } } }
@@ -285,7 +286,7 @@ private fun RowScope.Key(
         if (hint != null) {
             // Stacked rather than in a corner: keys are too narrow for hints like `a̍h` beside the label.
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(hint, fontSize = 11.sp, lineHeight = 13.sp, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(hint.ifEmpty { " " }, fontSize = 11.sp, lineHeight = 13.sp, color = colors.onSurfaceVariant, maxLines = 1)
                 Text(label, fontSize = 18.sp, lineHeight = 20.sp, color = colors.onSurface, maxLines = 1)
             }
         } else {
