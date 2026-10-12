@@ -92,7 +92,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         state.directInput = isDirectInput(info)
         learning = info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING == 0
         state.enterLabel = enterLabel(info)
-        state.showSwitchKey = shouldOfferSwitchingToNextInputMethod()
+        state.offerSwitchKey = shouldOfferSwitchingToNextInputMethod()
         state.layer = if (isNumericField(info)) KeyboardLayer.SYMBOLS else KeyboardLayer.LETTERS
         state.shifted = false
         state.mode = prefs.outputMode
@@ -130,6 +130,10 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             composingShown = false
             render()
         }
+    }
+
+    override fun onCustomImeSwitcherButtonRequestedVisible(visible: Boolean) {
+        state.customSwitcherRequested = visible
     }
 
     override fun onDestroy() {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -205,9 +206,14 @@ private fun SymbolKeys(state: KeyboardState, onKey: (KeyAction) -> Unit) {
 
 @Composable
 private fun BottomRow(state: KeyboardState, onKey: (KeyAction) -> Unit, layerLabel: String) {
+    // A system-provided IME navigation bar (it gives the IME window captionBar insets) already
+    // draws its own IME switcher, so only offer ours when that bar is absent, or when the system
+    // explicitly asks for a custom one.
+    val systemDrawsSwitcher = WindowInsets.captionBar.getBottom(LocalDensity.current) > 0
+    val showSwitchKey = state.customSwitcherRequested || (state.offerSwitchKey && !systemDrawsSwitcher)
     KeyRow {
         Key(layerLabel, weight = 1.5f, function = true) { onKey(KeyAction.ToggleLayer) }
-        if (state.showSwitchKey) Key("🌐", function = true) { onKey(KeyAction.SwitchInputMethod) }
+        if (showSwitchKey) Key("🌐", function = true) { onKey(KeyAction.SwitchInputMethod) }
         Key(",") { onKey(KeyAction.Symbol(",")) }
         Key(if (state.directInput) "" else modeLabel(state.mode, state.system), weight = 4f) { onKey(KeyAction.Space) }
         Key("-") { onKey(KeyAction.Separator) }

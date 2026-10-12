@@ -22,7 +22,15 @@ class KeyboardState {
     /** Composition disabled: passwords, URLs, numbers and similar fields. */
     var directInput by mutableStateOf(false)
     var enterLabel by mutableStateOf("⏎")
-    var showSwitchKey by mutableStateOf(false)
+
+    /** Switching to another input method makes sense (more than one is enabled). */
+    var offerSwitchKey by mutableStateOf(false)
+
+    /**
+     * The system asked us to draw our own switcher (API 36+), because the IME navigation bar it
+     * would otherwise draw one in has been hidden.
+     */
+    var customSwitcherRequested by mutableStateOf(false)
 }
 
 /** User actions on the keyboard. */
