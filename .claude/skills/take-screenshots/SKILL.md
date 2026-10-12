@@ -23,8 +23,7 @@ The F-Droid listing uses the same images as `fastlane/metadata/android/{en-US,zh
 2. **Use an emulator, never a physical device.** The script only picks a device automatically if exactly one emulator is running, and it never picks a physical one. If none is running, boot the `Pixel_8a` AVD (1080×2400; the README images are 1080 px wide) headless, with logs in the scratchpad:
    ```sh
    (nohup ~/Android/Sdk/emulator/emulator -avd Pixel_8a -no-window -no-audio -no-snapshot-save > <scratchpad>/emulator.log 2>&1 &)
-   adb -s emulator-5554 wait-for-device
-   # then poll until `adb -s emulator-5554 shell getprop sys.boot_completed` prints 1
+   scripts/wait-for-device.sh -s emulator-5554   # booted, services up, screen unlocked, no system dialog
    ```
    With `-no-snapshot-save`, the emulator boots from its last saved snapshot every time, and the app is reinstalled by the script anyway.
 3. **Capture into the scratchpad first** and look at both images before replacing anything:

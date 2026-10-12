@@ -61,6 +61,7 @@ Requirements: Android SDK (compile SDK 37) and JDK 17 or newer; Gradle provision
 ```sh
 ./gradlew :app:assembleDebug     # build the debug APK 組建除錯版 APK
 ./gradlew :core:test             # run the input engine tests 執行輸入引擎測試
+scripts/wait-for-device.sh               # wait until the device/emulator is ready 等待裝置或模擬器就緒
 ./gradlew :app:connectedDebugAndroidTest  # instrumented tests on a device/emulator 在裝置或模擬器上執行儀器測試
 ```
 

@@ -147,8 +147,9 @@ def main():
 
     dev = Device(pick_serial(args.serial))
     print(f"device: {dev.serial}")
-    if dev.shell("getprop sys.boot_completed").strip() != "1":
-        raise Abort("device has not finished booting")
+    # Booted is not enough on a cold emulator; wait until services are up and the screen is free.
+    if subprocess.run(["scripts/wait-for-device.sh", "-s", dev.serial, "-t", "180"]).returncode != 0:
+        raise Abort("device is not ready")
 
     # Read before installing: reinstalling the selected IME resets the selection.
     previous_ime = dev.shell("settings get secure default_input_method").strip()
@@ -182,6 +183,11 @@ def main():
         wait_for("the settings screen", app_on_top)
 
         def find_field():
+            # On a fresh boot the launcher may come up over us; bring the settings screen back
+            # rather than swiping around in the launcher.
+            if not app_on_top():
+                dev.shell(f"am start -W -n {ACTIVITY}")
+                return None
             for window, kind in dev.windows():
                 if kind == "TYPE_APPLICATION":
                     for n in window.iter("node"):

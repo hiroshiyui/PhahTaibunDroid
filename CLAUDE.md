@@ -22,6 +22,8 @@ Phah Taibun Droid (拍台文) is an Android IME for Taigi (台語, Taiwanese Hok
 
 Testing the IME on a device/emulator:
 ```sh
+scripts/wait-for-device.sh -s emulator-5554   # wait until a (cold-booted) device is really usable, not just sys.boot_completed
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:connectedDebugAndroidTest   # instrumented tests; pin the serial so a connected phone isn't used too
 adb shell ime enable org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
 adb shell ime set    org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
 ```
