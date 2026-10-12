@@ -26,7 +26,7 @@ adb shell ime enable org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInput
 adb shell ime set    org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
 ```
 On emulators the service always shows its keyboard (`onEvaluateInputViewShown`), even though the host keyboard counts as a hardware keyboard, so the "Show on-screen keyboard" setting isn't needed.
-`MainActivity` (setup + settings) has a "Try it" text field for testing.
+`MainActivity` (setup + settings) has a "Try it" text field for testing. README/F-Droid screenshots are captured by the `take-screenshots` skill (`.claude/skills/take-screenshots/scripts/take_screenshots.py`, emulator only).
 
 ## Architecture
 
