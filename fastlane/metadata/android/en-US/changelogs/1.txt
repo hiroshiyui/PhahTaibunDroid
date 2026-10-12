@@ -1,0 +1,7 @@
+Hello! This is my first preview release. I'm still early in development, so expect rough edges.
+
+* Type Taigi in POJ or Tâi-lô, mixed freely, without tone marks; switch between Hàn-lô and romanization anytime.
+* Long input converts in one go; abbreviations (tg → 台語) and ? wildcards work too.
+* Give every syllable a tone number to get exactly what you typed.
+* Fuzzy matching for accents and Mandarin-pinyin habits.
+* I learn your word choices on your device only.

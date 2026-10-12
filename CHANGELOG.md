@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-13
+
 ### Added
 
 - Taigi input method accepting POJ (Pe̍h-ōe-jī) and Tâi-lô, freely mixed; both are normalized to canonical Tâi-lô, so spelling differences between the systems (`ch`/`ts`, `oa`/`ua`, `oe`/`ue`, `eng`/`ing`, `ek`/`ik`, `o͘`/`oo`, `ⁿ`/`nn`) always match.
@@ -38,3 +40,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Romanization: Tâi-lô `ere` takes its tone mark on the second e (`erê`), `o͘ⁿ` is read as `oⁿ`, and POJ `ṳ`/`o̤` are accepted (found by cross-checking with KeSi).
 - Cloud backup is disabled: settings and word history are no longer included in Google Drive backups (device-to-device transfer still works).
 - Project renamed to Phah Taibun Droid to avoid a naming conflict with [rime-phah-taibun](https://github.com/soanseng/rime-phah-taibun). The application ID is now `org.ghostsinthelab.app.phahtaibundroid`; test installs under the old ID must be uninstalled separately.
+
+[Unreleased]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/hiroshiyui/PhahTaibunDroid/releases/tag/0.1.0

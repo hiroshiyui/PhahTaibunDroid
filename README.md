@@ -1,6 +1,6 @@
->**⚠️ Work in progress:** This project is under active development and is not yet useful for everyday typing. Features, behavior and the dictionary may change without notice, and no release is available.
+>**⚠️ Early preview:** This project is under active development and not yet ready for everyday typing. Features, behavior and the dictionary may change without notice. Preview builds are available from [GitHub Releases](https://github.com/hiroshiyui/PhahTaibunDroid/releases).
 >
->**⚠️ 開發中：** 本專案仍在積極開發階段，目前尚不適合日常輸入使用。功能、行為與辭典內容都可能隨時變動，也尚未提供任何正式釋出版本。
+>**⚠️ 早期預覽：** 本專案仍在積極開發階段，目前尚不適合日常輸入使用。功能、行為與辭典內容都可能隨時變動。預覽版本可從 [GitHub Releases](https://github.com/hiroshiyui/PhahTaibunDroid/releases) 取得。
 
 # Phah Taibun Droid 拍台文
 
