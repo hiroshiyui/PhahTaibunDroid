@@ -283,16 +283,14 @@ private fun RowScope.Key(
         contentAlignment = Alignment.Center,
     ) {
         if (hint != null) {
-            Text(
-                hint,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(end = 4.dp),
-                fontSize = 10.sp,
-                color = colors.onSurfaceVariant,
-            )
+            // Stacked rather than in a corner: keys are too narrow for hints like `a̍h` beside the label.
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(hint, fontSize = 11.sp, lineHeight = 13.sp, color = colors.onSurfaceVariant, maxLines = 1)
+                Text(label, fontSize = 18.sp, lineHeight = 20.sp, color = colors.onSurface, maxLines = 1)
+            }
+        } else {
+            Text(label, fontSize = if (label.length > 3) 14.sp else 20.sp, color = colors.onSurface, maxLines = 1)
         }
-        Text(label, fontSize = if (label.length > 3) 14.sp else 20.sp, color = colors.onSurface, maxLines = 1)
     }
 }
 
