@@ -23,6 +23,8 @@ This project maintains documentation in both **English (en-US)** and **Tradition
 | `PRIVACY-POLICY.md` | Privacy policy |
 | `NOTICE` | Copyright and license information for all external, third-party resources (data, libraries, tooling) |
 | `LICENSE` | GPL-3.0-or-later |
+| `TODO.md` | Known gaps and planned work as grouped checklists (English only, developer-facing) |
+| `CHANGELOG.md` | Developer-facing history in Keep a Changelog format, `## [Unreleased]` on top (English only; user-facing bilingual notes go in the F-Droid changelogs) |
 | `CLAUDE.md` | Guidance for Claude Code |
 
 Create any of these that do not exist yet when the task calls for them.
