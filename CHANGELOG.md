@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- The dictionary loads about twice as fast and with a fraction of the temporary memory (Nokia G50 release build: 713 → 336 ms; Java heap while loading 73 → 25 MB, once loaded 26 → 21 MB).
 - In romanization mode, pieces selected one by one are joined by what was typed between them (`-` when typed as one run), not always by spaces.
 - Romanization: Tâi-lô `ere` takes its tone mark on the second e (`erê`), `o͘ⁿ` is read as `oⁿ`, and POJ `ṳ`/`o̤` are accepted (found by cross-checking with KeSi).
 - Cloud backup is disabled: settings and word history are no longer included in Google Drive backups (device-to-device transfer still works).

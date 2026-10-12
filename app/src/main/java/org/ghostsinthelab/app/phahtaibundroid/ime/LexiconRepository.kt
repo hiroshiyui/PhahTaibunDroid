@@ -1,6 +1,8 @@
 package org.ghostsinthelab.app.phahtaibundroid.ime
 
 import android.content.Context
+import android.os.SystemClock
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -15,6 +17,7 @@ import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
  * rules change.
  */
 object LexiconRepository {
+    private const val TAG = "LexiconRepository"
     private const val ASSET = "lexicon.tsv"
     private const val BIGRAM_ASSET = "bigrams.tsv"
     private val mutex = Mutex()
@@ -23,13 +26,16 @@ object LexiconRepository {
     suspend fun get(context: Context, rules: Set<FuzzyRule>): Lexicon = mutex.withLock {
         current?.takeIf { it.rules == rules }?.let { return it }
         withContext(Dispatchers.Default) {
+            val start = SystemClock.elapsedRealtime()
             val loaded = current ?: run {
                 val assets = context.applicationContext.assets
                 val entries = assets.open(ASSET).use(Lexicon::readEntries)
                 val bigrams = assets.open(BIGRAM_ASSET).use { Bigrams.read(it, entries) }
                 Lexicon(entries, rules, bigrams)
             }
-            loaded.withRules(rules)
+            loaded.withRules(rules).also {
+                Log.i(TAG, "lexicon ready: ${it.entries.size} entries in ${SystemClock.elapsedRealtime() - start} ms")
+            }
         }.also { current = it }
     }
 }

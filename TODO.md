@@ -16,7 +16,7 @@ Known gaps and planned work. Check items off (or remove them) as they land, and 
 - [x] Abbreviated input using syllable initials only (e.g. `tg` → Tâi-gí).
 - [x] In romanization mode, pieces selected separately are joined with spaces even when they form one word.
 - [ ] User dictionary for adding custom words.
-- [ ] Measure lexicon load time and memory on a real device; switch to a compact binary format if needed.
+- [x] Measure lexicon load time and memory on a real device (Nokia G50, release build): 336 ms and about 21 MB of Java heap once loaded, after replacing the map-based index with flat arrays and parsing the asset's bytes directly (before: 713 ms, 26 MB, with a 73 MB peak while loading). A binary format isn't needed for now.
 - [x] Neutral-tone candidates: offer `--` forms (e.g. 轉--來, 食--飽) from the dictionary and simple rules.
 - [x] `?` wildcard for an unsure syllable or part of one (e.g. `s?ah`).
 - [ ] A trailing `?` while composing is now a wildcard, so ending a sentence with `?` needs a commit first; consider treating `?` followed by space/enter as punctuation.

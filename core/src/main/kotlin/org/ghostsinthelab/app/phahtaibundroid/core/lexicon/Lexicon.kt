@@ -3,7 +3,6 @@ package org.ghostsinthelab.app.phahtaibundroid.core.lexicon
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.Romanization
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.Syllable
-import java.io.BufferedReader
 import java.io.InputStream
 import java.io.Writer
 import java.util.concurrent.ConcurrentHashMap
@@ -47,44 +46,84 @@ class Lexicon(
     val rules: Set<FuzzyRule> = FuzzyRule.DEFAULTS,
     val bigrams: Bigrams = Bigrams.NONE,
 ) {
-    private val byKey = HashMap<String, MutableList<LexiconEntry>>(entries.size)
+    // The index is a few flat arrays rather than a map of lists: with ~86k entries, per-key
+    // objects and the garbage made while building them dominated the keyboard's memory.
+
+    /** Distinct loose keys (space-joined loose syllables), sorted. */
     private val sortedKeys: Array<String>
-    private val syllableSet = HashSet<String>()
+
+    /** Entries grouped by key, in [sortedKeys] order, each group most common first. */
+    private val ordered: Array<LexiconEntry>
+    private val orderedList: List<LexiconEntry>
+
+    /** The entries of `sortedKeys[k]` are `ordered[keyStart[k] until keyStart[k + 1]]`. */
+    private val keyStart: IntArray
+
+    private val syllableSet: Set<String>
     private val sortedSyllables: Array<String>
 
     /** Canonical syllable bases and their loose forms, for wildcard matching. */
     private val canonicalToLoose: Map<String, String>
 
-    /** Keys grouped by the first letters of their syllables (`tai gi` → `tg`), most common first. */
-    private val byInitials = HashMap<String, Array<String>>()
+    /**
+     * Key indices grouped by the first letters of their syllables (`tai gi` → `tg`), most common
+     * first. Only abbreviated and wildcard input needs it, so it is built on first use.
+     */
+    private val byInitials: Map<String, IntArray> by lazy(::buildInitialsIndex)
     private val wildcardCache = ConcurrentHashMap<String, Set<String>>()
 
     init {
-        val looseCache = HashMap<String, String>()
-        for (entry in entries) {
-            val bases = baseSequence(entry.romanization) ?: continue
-            val loose = bases.map { b -> looseCache.getOrPut(b) { FuzzyRule.loosen(b, rules) } }
-            syllableSet.addAll(loose)
-            byKey.getOrPut(loose.joinToString(KEY_SEPARATOR)) { ArrayList(1) } += entry
+        val syllables = SyllableTable(rules)
+        val keys = arrayOfNulls<String>(entries.size)
+        val builder = StringBuilder()
+        var indexed = 0
+        for ((i, entry) in entries.withIndex()) {
+            keys[i] = syllables.looseKey(entry.romanization, builder)?.also { indexed++ }
         }
-        for (list in byKey.values) list.sortByDescending { it.weight }
-        sortedKeys = byKey.keys.toTypedArray().also { it.sort() }
-        sortedSyllables = syllableSet.toTypedArray().also { it.sort() }
-        canonicalToLoose = looseCache
-
-        // Bucket keys by top weight (weights are small integers), most common first, then group.
-        val byWeight = sortedKeys.groupBy { byKey.getValue(it)[0].weight }
-        val grouped = HashMap<String, ArrayList<String>>()
-        val initials = StringBuilder()
-        for (weight in byWeight.keys.sortedDescending()) {
-            for (key in byWeight.getValue(weight)) {
-                initials.setLength(0)
-                initials.append(key[0])
-                for (i in 1 until key.length) if (key[i - 1] == ' ') initials.append(key[i])
-                grouped.getOrPut(initials.toString()) { ArrayList() } += key
+        // Sort entry indices by key, then by weight (most common first); stable for equal weights.
+        val order = IntArray(indexed)
+        var n = 0
+        for (i in entries.indices) if (keys[i] != null) order[n++] = i
+        mergeSort(order) { a, b ->
+            val byKey = keys[a]!!.compareTo(keys[b]!!)
+            if (byKey != 0) byKey else entries[b].weight.compareTo(entries[a].weight)
+        }
+        val uniqueKeys = ArrayList<String>()
+        val starts = IntArray(indexed + 1)
+        ordered = Array(indexed) { entries[order[it]] }
+        for ((pos, i) in order.withIndex()) {
+            val key = keys[i]!!
+            if (uniqueKeys.isEmpty() || uniqueKeys.last() != key) {
+                starts[uniqueKeys.size] = pos
+                uniqueKeys += key
             }
         }
-        for ((k, keys) in grouped) byInitials[k] = keys.toTypedArray()
+        starts[uniqueKeys.size] = indexed
+        sortedKeys = uniqueKeys.toTypedArray()
+        keyStart = starts.copyOf(sortedKeys.size + 1)
+        orderedList = ordered.asList()
+        canonicalToLoose = syllables.canonicalToLoose()
+        syllableSet = canonicalToLoose.values.toHashSet()
+        sortedSyllables = syllableSet.toTypedArray().also { it.sort() }
+    }
+
+    /** The entries of the key at index [k] of [sortedKeys]. */
+    private fun group(k: Int): List<LexiconEntry> = orderedList.subList(keyStart[k], keyStart[k + 1])
+
+    private fun buildInitialsIndex(): Map<String, IntArray> {
+        // Keys by their most common entry's weight, most common first; ties keep key order.
+        val byWeight = IntArray(sortedKeys.size) { it }
+        mergeSort(byWeight) { a, b -> ordered[keyStart[b]].weight.compareTo(ordered[keyStart[a]].weight) }
+        val grouped = HashMap<String, IntList>()
+        val initials = StringBuilder()
+        for (k in byWeight) {
+            val key = sortedKeys[k]
+            initials.setLength(0)
+            initials.append(key[0])
+            for (i in 1 until key.length) if (key[i - 1] == ' ') initials.append(key[i])
+            grouped.getOrPut(initials.toString()) { IntList() }.add(k)
+        }
+        return grouped.mapValuesTo(HashMap(grouped.size)) { it.value.toArray() }
     }
 
     fun withRules(rules: Set<FuzzyRule>): Lexicon = if (rules == this.rules) this else Lexicon(entries, rules, bigrams)
@@ -101,8 +140,10 @@ class Lexicon(
     }
 
     /** Entries whose loose syllable sequence equals [looseBases], most common first. */
-    fun lookup(looseBases: List<String>): List<LexiconEntry> =
-        byKey[looseBases.joinToString(KEY_SEPARATOR)].orEmpty()
+    fun lookup(looseBases: List<String>): List<LexiconEntry> {
+        val k = sortedKeys.binarySearch(looseBases.joinToString(KEY_SEPARATOR))
+        return if (k >= 0) group(k) else emptyList()
+    }
 
     /**
      * Entries whose loose sequence starts with [completeBases] followed by a syllable starting
@@ -115,12 +156,13 @@ class Lexicon(
         var i = lowerBound(sortedKeys, prefix)
         var scanned = 0
         while (i < sortedKeys.size && scanned < PREFIX_SCAN_LIMIT) {
-            val key = sortedKeys[i++]
+            val k = i++
+            val key = sortedKeys[k]
             if (!key.startsWith(prefix)) break
             scanned++
             // Prefer completions with exactly as many syllables as typed.
             if (key.count { it == ' ' } + 1 != wanted) continue
-            found += byKey.getValue(key)
+            found += group(k)
         }
         found.sortByDescending { it.weight }
         return if (found.size > limit) found.subList(0, limit) else found
@@ -156,12 +198,12 @@ class Lexicon(
         for (combo in combos) {
             val keys = byInitials[combo] ?: continue
             var matched = 0
-            for (key in keys) {
+            for (k in keys) {
                 if (matched >= limit || scanned >= MATCH_SCAN_LIMIT) break
                 scanned++
-                val syllables = key.split(KEY_SEPARATOR)
+                val syllables = sortedKeys[k].split(KEY_SEPARATOR)
                 if (patterns.indices.all { patterns[it].matches(syllables[it]) }) {
-                    found += byKey.getValue(key)
+                    found += group(k)
                     matched++
                 }
             }
@@ -180,19 +222,58 @@ class Lexicon(
         /**
          * Reads the compiled lexicon format: UTF-8 TSV lines of
          * `hanlo<TAB>numeric-tailo<TAB>weight[<TAB>hanlo-poj]`; `#` starts a comment line.
+         * Fields are decoded straight from the file's bytes, without per-line strings or lists.
          */
-        fun readEntries(input: InputStream): List<LexiconEntry> =
-            input.bufferedReader(Charsets.UTF_8).use(::readEntries)
-
-        fun readEntries(reader: BufferedReader): List<LexiconEntry> {
+        fun readEntries(input: InputStream): List<LexiconEntry> {
+            val bytes = input.readBytes()
             val entries = ArrayList<LexiconEntry>(100_000)
-            reader.forEachLine { line ->
-                if (line.isEmpty() || line[0] == '#') return@forEachLine
-                val f = line.split('\t')
-                if (f.size < 3) return@forEachLine
-                entries += LexiconEntry(f[0], f.getOrNull(3)?.ifEmpty { null }, f[1], f[2].toIntOrNull() ?: 1)
+            val fieldStart = IntArray(4)
+            val fieldEnd = IntArray(4)
+            var lineStart = 0
+            while (lineStart < bytes.size) {
+                var lineEnd = lineStart
+                while (lineEnd < bytes.size && bytes[lineEnd] != NEWLINE) lineEnd++
+                var end = lineEnd
+                if (end > lineStart && bytes[end - 1] == CARRIAGE_RETURN) end--
+                if (end > lineStart && bytes[lineStart] != COMMENT) {
+                    var fields = 0
+                    var start = lineStart
+                    for (i in lineStart..end) {
+                        if (i == end || bytes[i] == TAB) {
+                            if (fields < 4) {
+                                fieldStart[fields] = start
+                                fieldEnd[fields] = i
+                            }
+                            fields++
+                            start = i + 1
+                        }
+                    }
+                    if (fields >= 3) {
+                        fun text(f: Int) = String(bytes, fieldStart[f], fieldEnd[f] - fieldStart[f], Charsets.UTF_8)
+                        val poj = if (fields >= 4 && fieldEnd[3] > fieldStart[3]) text(3) else null
+                        entries += LexiconEntry(text(0), poj, text(1), parseWeight(bytes, fieldStart[2], fieldEnd[2]))
+                    }
+                }
+                lineStart = lineEnd + 1
             }
             return entries
+        }
+
+        private const val NEWLINE = '\n'.code.toByte()
+        private const val CARRIAGE_RETURN = '\r'.code.toByte()
+        private const val TAB = '\t'.code.toByte()
+        private const val COMMENT = '#'.code.toByte()
+
+        /** A non-negative decimal weight, or 1 if the field isn't one. */
+        private fun parseWeight(bytes: ByteArray, start: Int, end: Int): Int {
+            if (start == end) return 1
+            var value = 0
+            for (i in start until end) {
+                val digit = bytes[i] - '0'.code.toByte()
+                if (digit !in 0..9 || value > (Int.MAX_VALUE - digit) / 10) return 1
+                value = value * 10 + digit
+            }
+            return value
         }
 
         fun writeEntries(entries: List<LexiconEntry>, out: Writer) {
