@@ -46,6 +46,12 @@ interface UserHistory {
     fun boost(hanlo: String?, numeric: String): Int
     fun record(hanlo: String?, numeric: String)
 
+    /** Extra score for [next] right after [previous], from word pairs the user chose before. */
+    fun pairBoost(previous: LexiconEntry, next: LexiconEntry): Int = 0
+
+    /** Notes that the user chose [next] right after [previous]. */
+    fun recordPair(previous: LexiconEntry, next: LexiconEntry) = Unit
+
     object None : UserHistory {
         override fun boost(hanlo: String?, numeric: String) = 0
         override fun record(hanlo: String?, numeric: String) = Unit
@@ -156,7 +162,7 @@ class CandidateEngine(
         }
         val hanlo = entry.hanlo
         score += history.boost(hanlo, entry.romanization)
-        if (context != null) score += phrases.contextBonus(context, entry)
+        if (context != null) score += phrases.contextBonus(context, entry) + history.pairBoost(context, entry)
         return Candidate(
             hanlo = hanlo,
             hanloPoj = entry.hanloPoj,

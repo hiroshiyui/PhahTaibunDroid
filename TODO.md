@@ -12,7 +12,7 @@ Known gaps and planned work. Check items off (or remove them) as they land, and 
 ## Input engine
 
 - [ ] Physical (hardware) keyboard input via `onKeyDown`; only the on-screen keys work today.
-- [ ] Better ranking data: weights only count how often an entry appears in the sources, so there is no real word-frequency information. The dictionary builder can now derive frequencies and word pairs from a line-aligned corpus (`Corpus.kt`), but no corpus with a usable license has been found yet (see Data). The news-domain iCorpus also under-weights everyday words such as pronouns, so a conversational corpus would be best.
+- [ ] Better ranking data: weights only count how often an entry appears in the sources. Ranking now also learns word choices and word pairs from the user's own history (`FrequencyHistory`); if no GPL-compatible corpus turns up (see Data), that is the plan, and this item can be closed.
 - [x] Abbreviated input using syllable initials only (e.g. `tg` → Tâi-gí).
 - [x] In romanization mode, pieces selected separately are joined with spaces even when they form one word.
 - [ ] User dictionary for adding custom words.
@@ -29,7 +29,7 @@ Known gaps and planned work. Check items off (or remove them) as they land, and 
 Candidates come largely from the resource list in the [寫台文 (rime-phah-taibun) guide](https://taigi.anatomind.com/guide#/research). Anything bundled in the APK must be GPL-3.0-or-later compatible and credited in `NOTICE`.
 
 - [ ] Find a conversational Taigi corpus with a GPL-compatible license for word frequencies and word pairs.
-- [ ] Check whether 教育部本土語言標注臺灣地名 (Taiwan place names, CC BY 3.0 TW) can be combined with GPL-3.0-or-later; if so, add place names.
+- [x] Check whether 教育部本土語言標注臺灣地名 (Taiwan place names, CC BY 3.0 TW) can be combined with GPL-3.0-or-later: unclear (FSF only states compatibility for CC BY 4.0), so place names are skipped for now.
 - [ ] Ask for permission before using these; they can't be bundled as they stand:
   - [楊允言 word frequencies (Ungian_2009_KIPsupin)](https://github.com/Taiwanese-Corpus/Ungian_2009_KIPsupin): no license stated.
   - 教育部 臺灣台語常用詞辭典 / [KipSutian](https://github.com/ChhoeTaigi/KipSutianDataMirror): CC BY-ND (no derivatives).

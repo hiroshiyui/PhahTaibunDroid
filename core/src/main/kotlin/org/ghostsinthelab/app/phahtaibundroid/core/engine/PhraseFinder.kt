@@ -54,7 +54,8 @@ internal class PhraseFinder(
                 if (edges.isEmpty()) continue
                 val to = beams[j]
                 for (state in from) for (edge in edges) {
-                    val score = state.score + edge.score + SCALE * logProbability(state.entry, edge.entry)
+                    val learned = state.entry?.let { history.pairBoost(it, edge.entry) } ?: 0
+                    val score = state.score + edge.score + learned + SCALE * logProbability(state.entry, edge.entry)
                     insert(to, State(edge.entry, score, state))
                 }
             }

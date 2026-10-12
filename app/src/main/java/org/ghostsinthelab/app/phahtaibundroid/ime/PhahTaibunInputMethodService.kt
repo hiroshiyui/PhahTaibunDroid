@@ -29,6 +29,7 @@ import org.ghostsinthelab.app.phahtaibundroid.core.engine.FrequencyHistory
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.SyllablePatterns
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.UserHistory
+import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.LexiconEntry
 import org.ghostsinthelab.app.phahtaibundroid.ime.ui.KeyboardScreen
 import org.ghostsinthelab.app.phahtaibundroid.settings.AppLanguage
 import org.ghostsinthelab.app.phahtaibundroid.settings.ImePreferences
@@ -60,7 +61,14 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         override fun record(hanlo: String?, numeric: String) {
             if (learning) history.record(hanlo, numeric)
         }
+        override fun pairBoost(previous: LexiconEntry, next: LexiconEntry) = history.pairBoost(previous, next)
+        override fun recordPair(previous: LexiconEntry, next: LexiconEntry) {
+            if (learning) history.recordPair(previous, next)
+        }
     }
+
+    /** Set when we commit text, so the editor's next selection update isn't taken for a cursor move. */
+    private var ownEditPending = false
 
     private val historySaveScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -150,6 +158,10 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             composer.reset()
             composingShown = false
             render()
+        } else if (!composer.isComposing && candidatesStart < 0) {
+            // After our own commit the cursor moves with the text; any other move (a tap elsewhere,
+            // a selection) means the next word doesn't follow the last one.
+            if (ownEditPending && newSelStart == newSelEnd) ownEditPending = false else composer.forgetContext()
         }
     }
 
@@ -188,6 +200,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
                 } else {
                     finishComposition()
                     commit(action.char.toString())
+                    composer?.forgetContext()
                 }
             is KeyAction.Symbol ->
                 // While composing, `?` is a wildcard for unsure letters (`s?ah`), not punctuation.
@@ -196,14 +209,25 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
                 } else {
                     finishComposition()
                     commit(if (state.mode == OutputMode.HANLO) FULL_WIDTH[action.text] ?: action.text else action.text)
+                    composer?.forgetContext()
                 }
             is KeyAction.SelectCandidate -> composer?.select(action.index)?.let(::commit)
             KeyAction.Separator ->
-                if (composer != null && composer.rawInput.isNotEmpty()) composer.type('-') else commit("-")
+                if (composer != null && composer.rawInput.isNotEmpty()) {
+                    composer.type('-')
+                } else {
+                    commit("-")
+                    composer?.forgetContext()
+                }
             KeyAction.Space ->
                 if (composer != null && composer.isComposing) composer.commitFirst()?.let(::commit) else commit(" ")
             KeyAction.Enter ->
-                if (composer != null && composer.isComposing) commit(composer.commitPreview()) else sendEnter()
+                if (composer != null && composer.isComposing) {
+                    commit(composer.commitPreview())
+                } else {
+                    sendEnter()
+                    composer?.forgetContext()
+                }
             KeyAction.Backspace ->
                 if (composer?.backspace() != true) sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL)
             KeyAction.Shift -> state.shifted = !state.shifted
@@ -227,6 +251,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
     }
 
     private fun commit(text: String) {
+        ownEditPending = true
         currentInputConnection?.commitText(text, 1)
     }
 

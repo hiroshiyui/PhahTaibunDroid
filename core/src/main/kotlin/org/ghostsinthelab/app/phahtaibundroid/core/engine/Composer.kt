@@ -1,5 +1,6 @@
 package org.ghostsinthelab.app.phahtaibundroid.core.engine
 
+import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.LexiconEntry
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.Boundary
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 
@@ -41,6 +42,16 @@ class Composer(
     private val raw = StringBuilder()
     private val selections = ArrayList<Selection>()
 
+    /**
+     * The last word committed, so the next composition can continue from it (word-pair learning
+     * and ranking). Cleared by [reset] and [forgetContext], e.g. after punctuation or a cursor move.
+     */
+    private var lastWord: LexiconEntry? = null
+
+    /** The word right before the raw input: the last selected piece, or the last committed word. */
+    private val context: LexiconEntry?
+        get() = if (selections.isEmpty()) lastWord else selections.last().candidate.entries.lastOrNull()
+
     var candidates: List<Candidate> = emptyList()
         private set
 
@@ -57,7 +68,10 @@ class Composer(
         when {
             raw.isNotEmpty() -> raw.setLength(raw.length - 1)
             selections.isNotEmpty() -> raw.insert(0, selections.removeAt(selections.lastIndex).raw)
-            else -> return false
+            else -> {
+                lastWord = null
+                return false
+            }
         }
         refresh()
         return true
@@ -70,6 +84,11 @@ class Composer(
     fun select(index: Int): String? {
         val candidate = candidates.getOrNull(index) ?: return null
         history.record(candidate.hanlo, candidate.numeric)
+        val words = candidate.entries
+        // A multi-word phrase also teaches its words and the pairs inside it.
+        if (words.size > 1) words.forEach { history.record(it.hanlo, it.romanization) }
+        context?.let { previous -> words.firstOrNull()?.let { history.recordPair(previous, it) } }
+        words.zipWithNext().forEach { (a, b) -> history.recordPair(a, b) }
         var end = candidate.consumed
         while (end < raw.length && !raw[end].isLetterOrDigit() && raw[end] != SyllablePatterns.WILDCARD) end++
         selections += Selection(candidate, raw.substring(0, end))
@@ -126,7 +145,7 @@ class Composer(
         candidates = if (raw.isEmpty()) {
             emptyList()
         } else {
-            engine.candidates(raw.toString(), context = selections.lastOrNull()?.candidate?.entries?.lastOrNull())
+            engine.candidates(raw.toString(), context = context)
         }
     }
 
@@ -134,6 +153,12 @@ class Composer(
         raw.setLength(0)
         selections.clear()
         candidates = emptyList()
+        lastWord = null
+    }
+
+    /** Ends the word context: what is typed next doesn't continue the last committed word. */
+    fun forgetContext() {
+        lastWord = null
     }
 
     /** Whether [c] belongs to romanized text (Latin letters, digits, combining marks such as o͘). */
@@ -142,7 +167,14 @@ class Composer(
         else -> c in '0'..'9'
     }
 
-    private fun finish(): String = preview().also { reset() }
+    private fun finish(): String {
+        val text = preview()
+        // Unconverted input (enter) ends in romanization, which is no dictionary word.
+        val last = if (raw.isEmpty()) selections.lastOrNull()?.candidate?.entries?.lastOrNull() else null
+        reset()
+        lastWord = last
+        return text
+    }
 
     /** In romanization mode, an initial capital typed by the user is kept. */
     private fun casedText(candidate: Candidate, typed: CharSequence): String {
