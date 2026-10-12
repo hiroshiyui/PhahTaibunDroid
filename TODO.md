@@ -40,11 +40,12 @@ Candidates come largely from the resource list in the [寫台文 (rime-phah-taib
 ## Localization
 
 - [x] Taigi UI locale (`nan-Hant-TW`, Hàn-lô) alongside English and Traditional Chinese.
-- [ ] Per-app language on Android 8–12 (no `LocaleManager` there; would need AppCompat or manual context wrapping).
+- [x] Per-app language on Android 8–12 (stored in app preferences and applied by context wrapping; not yet tested on a pre-13 device).
 
 ## Testing & release
 
 - [ ] Instrumented tests for the IME service and keyboard.
-- [ ] F-Droid metadata (`fastlane/metadata/android/{en-US,zh-TW}`).
-- [ ] `PRIVACY-POLICY.md`.
-- [ ] Release signing and CI.
+- [x] F-Droid metadata (`fastlane/metadata/android/{en-US,zh-TW}`).
+- [ ] Store screenshots of the settings screen, and zh-TW screenshots with a Chinese UI (the current ones show only the keyboard).
+- [x] `PRIVACY-POLICY.md`.
+- [x] Release signing (manual, from the tagged commit; see `.claude/skills/release-engineering`) and CI (GitHub Actions: unit tests, lint, debug build).

@@ -4,6 +4,8 @@
 
 # Phah Taibun Droid 拍台文
 
+[![CI](https://github.com/hiroshiyui/PhahTaibunDroid/actions/workflows/ci.yml/badge.svg)](https://github.com/hiroshiyui/PhahTaibunDroid/actions/workflows/ci.yml)
+
 <p>
   <img src="./media/keyboard-hanlo.png" width="45%" alt="Typing taigi in Hàn-lô mode: candidates 台語, 帶疑, 臺語… 以漢羅模式輸入 taigi：候選詞 台語、帶疑、臺語…">
   <img src="./media/keyboard-tailo.png" width="45%" alt="The same input in Tâi-lô mode: candidates Tâi-gí, tài-gî… 同一輸入切換為台羅模式：候選詞 Tâi-gí、tài-gî…">
@@ -37,9 +39,9 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 ## Usage 使用
 
-After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, which fuzzy-matching rules to use, and, on Android 13 and later, the app's language: English, Traditional Chinese or Taigi in Hàn-lô (Taigi is only offered there, since Android's own settings list only languages the system supports).
+After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, which fuzzy-matching rules to use, and the app's language: English, Traditional Chinese or Taigi in Hàn-lô (Taigi is only offered there, since Android's own settings list only languages the system supports).
 
-安裝後，請從桌面開啟「拍台文」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式、要使用的模糊比對規則，以及（Android 13 以上）介面語言：英文、繁體中文或台語漢羅。台語只能在這裡選擇，因為 Android 系統設定只列出系統本身支援的語言。
+安裝後，請從桌面開啟「拍台文」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式、要使用的模糊比對規則，以及介面語言：英文、繁體中文或台語漢羅。台語只能在這裡選擇，因為 Android 系統設定只列出系統本身支援的語言。
 
 | Key 按鍵 | Action 功能 |
 |---|---|
@@ -59,7 +61,12 @@ Requirements: Android SDK (compile SDK 37) and JDK 17 or newer; Gradle provision
 ```sh
 ./gradlew :app:assembleDebug     # build the debug APK 組建除錯版 APK
 ./gradlew :core:test             # run the input engine tests 執行輸入引擎測試
+./gradlew :app:connectedDebugAndroidTest  # instrumented tests on a device/emulator 在裝置或模擬器上執行儀器測試
 ```
+
+Every push and pull request runs the unit tests, lint and a debug build on GitHub Actions. Release APKs are signed by the maintainer (Android Studio → Build → Generate Signed APK) from the tagged release commit; the signing key is not part of the repository.
+
+每次推送與拉取請求都會在 GitHub Actions 上執行單元測試、lint 檢查並組建除錯版。正式版 APK 由維護者以標記的釋出提交自行簽署（Android Studio → Build → Generate Signed APK），簽署金鑰不在原始碼庫中。
 
 The dictionary is committed as `app/src/main/assets/lexicon.tsv`. To regenerate it from the upstream datasets:
 
@@ -89,6 +96,12 @@ The dictionary is built from datasets published by the [ChhoeTaigi 找台語](ht
 See [NOTICE](./NOTICE) for full third-party copyright and license information.
 
 完整的第三方版權與授權資訊，請參閱 [NOTICE](./NOTICE)。
+
+## Privacy 隱私
+
+Nothing you type leaves your device: the app has no Internet access, and its settings and word history are kept only in its private storage, excluded from cloud backups. See the [Privacy Policy](./PRIVACY-POLICY.md).
+
+您輸入的任何內容都不會離開您的裝置：本程式沒有網路存取權限，設定與選字紀錄只保存在程式的私有儲存空間，也不納入雲端備份。詳見[隱私權政策](./PRIVACY-POLICY.md)。
 
 ## License 授權
 

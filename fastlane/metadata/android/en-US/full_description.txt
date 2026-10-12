@@ -1,0 +1,19 @@
+Hello, I'm Phah Taibun Droid (拍台文), a keyboard for writing Taigi (台語, Taiwanese Hokkien).
+
+Type in POJ (Pe̍h-ōe-jī) or Tâi-lô, or mix them freely, and I'll give you Hàn-lô (漢羅) or properly tone-marked romanization.
+
+* No tone marks needed: type "taigi" and pick 台語 or Tâi-gí. Tone numbers ("tai5gi2") narrow the candidates when you want them to.
+
+* No syllable separators needed: "lihokamsia" becomes 你好 感謝, and you can convert it piece by piece.
+
+* Tap the input bar, or swipe the candidate bar up or down, to switch between Hàn-lô and romanization at any time.
+
+* Not sure of the spelling? Turn on fuzzy matching for omitted nasals or final stops, mixed-up codas, aspiration, accent variants, and Mandarin-pinyin habits, so "dageho" can still find 逐家好.
+
+* I learn which words you choose, but only on your device. I don't have Internet access, and nothing you type ever leaves your phone.
+
+* My interface speaks English, Traditional Chinese and Taigi.
+
+I'm still early in development, so expect rough edges. My dictionary comes from the ChhoeTaigi project (台文華文線頂辭典, CC BY-SA 4.0; iTaigi 華台對照典, CC0).
+
+My source code: https://github.com/hiroshiyui/PhahTaibunDroid
