@@ -15,9 +15,16 @@ import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 class Composer(
     var engine: CandidateEngine,
     var system: RomanSystem = RomanSystem.TAILO,
-    var mode: OutputMode = OutputMode.HANLO,
+    mode: OutputMode = OutputMode.HANLO,
     private val history: UserHistory = UserHistory.None,
 ) {
+    /** Output mode; changing it re-ranks the candidates (romanization puts exact input first). */
+    var mode: OutputMode = mode
+        set(value) {
+            field = value
+            refresh()
+        }
+
     /** A selected piece; [raw] is the input it consumed, including separators typed after it. */
     private class Selection(val candidate: Candidate, val raw: String) {
         /**
@@ -145,7 +152,11 @@ class Composer(
         candidates = if (raw.isEmpty()) {
             emptyList()
         } else {
-            engine.candidates(raw.toString(), context = context)
+            engine.candidates(raw.toString(), context = context).let { found ->
+                // In romanization mode, fully toned input is written exactly as typed.
+                val literal = found.takeIf { mode == OutputMode.ROMAN }?.firstOrNull { it.literal }
+                if (literal == null) found else listOf(literal) + (found - literal)
+            }
         }
     }
 

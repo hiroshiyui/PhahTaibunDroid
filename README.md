@@ -25,6 +25,7 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 * **POJ and Tâi-lô, side by side** — `chhiu` and `tshiu`, `hoe` and `hue`, `seng` and `sing` are all understood. Your choice of system only affects the output.
 * **No tone marks needed** — type `taigi` and get 台語 or **Tâi-gí**; tones come from the dictionary. Tone numbers (`tai5gi2`) narrow the candidates when you want them to.
+* **Or type exactly what you mean** — give every syllable a tone number, `1` and `4` included (`a1-ma2`, `phoenn7`, `si7-loo1-kuann5`), and the romanization is written exactly as typed, even for words or syllables the dictionary doesn't know. It comes first in romanization mode, and right after the matching words in Hàn-lô mode. Hyphens and `--` you type are kept.
 * **Fuzzy input** — optionally accept `o` for `o͘`, omitted nasalization (`a` for `aⁿ`), omitted final `h`, omitted or mixed-up entering-tone codas `p`/`t`/`k`/`h` (`ta` or `tat` for `ta̍k`), mixed-up nasal codas `m`/`n` and `n`/`ng`, unaspirated spellings, pinyin-style `b`/`g` for `p`/`k`, and accent variants such as `kue`/`ke`, `gí`/`gú`, `chhiⁿ`/`chheⁿ`, `ji̍t`/`li̍t`. Mandarin-pinyin initials are always understood: `d` for `t`, `z`/`zh` for `ts`, `c`/`q` for `tsh`, `x` for `s` — so `dageho` can find 逐家好 (ta̍k-ke-hó).
 * **Switch output anytime** — tap the input buffer, or swipe the candidate bar up or down, to flip between Hàn-lô and romanization. Words already chosen are re-rendered too.
 * **No separators needed** — `lihokamsia` is segmented into `lí hó kám-siā` (你好感謝); pick a word to convert the input piece by piece.
@@ -32,6 +33,7 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 * **白話字、台羅皆可**——`chhiu` 與 `tshiu`、`hoe` 與 `hue`、`seng` 與 `sing` 都能辨識，選用哪一套系統只影響輸出結果。
 * **不必輸入聲調符號**——輸入 `taigi` 即可得到「台語」或 **Tâi-gí**，聲調由辭典補上；需要時也可以用數字調號（`tai5gi2`）縮小候選範圍。
+* **也可以照實輸入**——每個音節都打上聲調數字（第 1、4 聲也要打 `1`、`4`，例如 `a1-ma2`、`phoenn7`、`si7-loo1-kuann5`），羅馬字就會完全照您的輸入呈現，辭典裡沒有的詞或音節也一樣：在羅馬字模式排在第一位，在漢羅模式則緊接在聲調相符的詞之後。您輸入的連字號與 `--` 都會保留。
 * **模糊輸入**——可選擇接受以 `o` 代替 `o͘`、省略鼻化音（`a` 代替 `aⁿ`）、省略字尾 `h`、省略或混用入聲韻尾 `p`／`t`／`k`／`h`（以 `ta` 或 `tat` 代替 `ta̍k`）、韻尾 `m`／`n` 或 `n`／`ng` 不分、不分送氣、以拼音式的 `b`／`g` 代替 `p`／`k`，以及 `kue`／`ke`、`gí`／`gú`、`chhiⁿ`／`chheⁿ`、`ji̍t`／`li̍t` 等腔調差異。華語拼音的聲母一律可用：`d` 代替 `t`、`z`／`zh` 代替 `ts`、`c`／`q` 代替 `tsh`、`x` 代替 `s`，因此輸入 `dageho` 也能找到「逐家好」（ta̍k-ke-hó）。
 * **隨時切換輸出**——點選輸入區，或上下滑動候選字列，即可在漢羅與羅馬字之間切換，已選定的詞也會一併重新呈現。
 * **不必分隔音節**——`lihokamsia` 會自動切分為 `lí hó kám-siā`（你好感謝），可逐段選字轉換。
@@ -46,7 +48,7 @@ After installing, open **Phah Taibun Droid** from the launcher and follow the tw
 | Key 按鍵 | Action 功能 |
 |---|---|
 | Letters 字母 | Type romanization 輸入羅馬字 |
-| `1`–`9` after a syllable 接在音節後 | Tone number 聲調數字 |
+| `1`–`9` after a syllable 接在音節後 | Tone number; tone every syllable (1 and 4 too) to write exactly what you type 聲調數字；每個音節都標調（含第 1、4 聲）即照實輸出 |
 | `-` | Syllable separator; `--` marks a neutral tone 音節分隔；`--` 表示輕聲 |
 | Space 空白鍵 | Choose the first candidate 選擇第一個候選詞 |
 | Enter 輸入鍵 | Commit the input as shown 依目前顯示內容送出 |

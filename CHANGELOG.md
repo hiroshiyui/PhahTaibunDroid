@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Abbreviated input with one letter per syllable (`tg` → 台語, `kms` → 感謝), ranked below fully spelled words.
 - `?` wildcard for unsure letters or a whole syllable (`s?ah`, `tai-?`).
 - Whole-input phrase candidates for long unseparated input (`tsuekinthinnkhitsinho` → 最近天氣真好), and words that often follow the previously selected one rank higher (word-pair data support; none bundled yet).
+- Exact romanization: when every syllable has a tone number (1 and 4 included) or tone mark, the input is offered exactly as typed — first in romanization mode, right after tone-matching words in Hàn-lô mode — including syllables the dictionary lacks (`hiunnh8` → hiu̍nnh); typed `-` and `--` are kept in the output.
 - Learning of word pairs from the user's own choices: a word picked after another one ranks higher the next time it follows that word, also across commits; the pairs stay on the device with the rest of the word history.
 - Neutral-tone forms: a typed `--` favours neutral-tone entries and offers common suffixes (`tsiahpa--ah` → 食飽矣).
 - F-Droid metadata (English and Traditional Chinese), privacy policy, and GitHub Actions CI running unit tests, lint and a debug build.

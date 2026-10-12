@@ -1,6 +1,8 @@
 package org.ghostsinthelab.app.phahtaibundroid.core
 
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
+import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
+import org.ghostsinthelab.app.phahtaibundroid.core.engine.Composer
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Bigrams
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Lexicon
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
@@ -64,6 +66,19 @@ class LexiconAssetTest {
         assertTrue("kansia", "感謝" in mn.candidates("kansia").take(3).map { it.hanlo })
         val nng = CandidateEngine(engine.lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.CODA_N_NG))
         assertTrue("singbun", "新聞" in nng.candidates("singbun").take(5).map { it.hanlo })
+    }
+
+    @Test
+    fun exactRomanization() {
+        fun roman(raw: String) = Composer(engine, mode = OutputMode.ROMAN).apply { raw.forEach(::type) }.displayCandidates().first().text
+        assertEquals("tài-gī", roman("tai3gi7"))
+        assertEquals("phuēnn", roman("phoenn7"))
+        assertEquals("sī-loo-kuânn", roman("si7-loo1-kuann5"))
+        assertEquals("tâi-gí--ê", roman("tai5-gi2--e5"))
+        // Typed separators win over the dictionary's word breaks, but a plain `-` keeps its `--`.
+        assertEquals("lí hó", roman("liho"))
+        assertEquals("lí-hó", roman("li-ho"))
+        assertEquals("tńg--lâi", roman("tng-lai"))
     }
 
     @Test

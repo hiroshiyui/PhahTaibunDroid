@@ -29,6 +29,10 @@ class Candidate(
     val score: Int,
     /** The lexicon entries this candidate is made of (several for a multi-word phrase). */
     val entries: List<LexiconEntry> = emptyList(),
+    /** The input exactly as typed, every syllable with its tone: shown first in romanization mode. */
+    val literal: Boolean = false,
+    /** Some syllable's tone differs from a tone the user typed. */
+    val toneConflict: Boolean = false,
 ) {
     fun roman(system: RomanSystem) = if (system == RomanSystem.POJ) poj else tailo
 
@@ -136,13 +140,18 @@ class CandidateEngine(
         }
         // Abbreviations have no romanization of their own; show those as typed.
         offer(romanCandidate(raw, segmentations.firstOrNull { seg -> seg.none { it.kind == InputSyllable.Kind.INITIAL } }))
-        return best.values.sortedByDescending { it.score }.take(limit)
+        val ranked = best.values.sortedByDescending { it.score }
+        // Exactly toned input: words agreeing with every typed tone, then the input as typed, then the rest.
+        val literal = ranked.firstOrNull { it.literal } ?: return ranked.take(limit)
+        val (agreeing, rest) = (ranked - literal).partition { it.consumed == raw.length && !it.toneConflict }
+        return (agreeing + literal + rest).take(limit)
     }
 
     private fun fromEntry(entry: LexiconEntry, input: List<InputSyllable>, coverage: Int, context: LexiconEntry?): Candidate? {
         val syllables = entry.syllables()
         if (syllables.size != input.size) return null
         var score = coverage + (ln(1.0 + entry.weight) * WEIGHT_FACTOR).toInt()
+        var toneConflict = false
         for ((i, pair) in input.zip(syllables).withIndex()) {
             val (typed, actual) = pair
             // A typed `--` asks for a neutral-tone entry; without one, entries compete normally.
@@ -157,21 +166,25 @@ class CandidateEngine(
                 typed.base == actual.base -> score += EXACT_SPELLING
             }
             if (typed.tone != Syllable.TONE_UNSPECIFIED) {
-                score += if (typed.tone == actual.withImplicitTone().tone) TONE_MATCH else TONE_MISMATCH
+                val agrees = typed.tone == actual.withImplicitTone().tone
+                score += if (agrees) TONE_MATCH else TONE_MISMATCH
+                if (!agrees) toneConflict = true
             }
         }
         val hanlo = entry.hanlo
         score += history.boost(hanlo, entry.romanization)
         if (context != null) score += phrases.contextBonus(context, entry) + history.pairBoost(context, entry)
+        val rendered = withTypedBoundaries(syllables, input)
         return Candidate(
             hanlo = hanlo,
             hanloPoj = entry.hanloPoj,
-            tailo = Romanization.render(syllables, RomanSystem.TAILO),
-            poj = Romanization.render(syllables, RomanSystem.POJ),
+            tailo = Romanization.render(rendered, RomanSystem.TAILO),
+            poj = Romanization.render(rendered, RomanSystem.POJ),
             numeric = entry.romanization,
             consumed = input.last().rawEnd,
             score = score,
             entries = listOf(entry),
+            toneConflict = toneConflict,
         )
     }
 
@@ -224,13 +237,38 @@ class CandidateEngine(
         return Candidate(
             hanlo = hanlo,
             hanloPoj = hanloPoj.takeIf { it != hanlo },
-            tailo = syllables.joinToString(" ") { Romanization.render(it, RomanSystem.TAILO) },
-            poj = syllables.joinToString(" ") { Romanization.render(it, RomanSystem.POJ) },
+            tailo = Romanization.render(phraseSyllables(syllables, input), RomanSystem.TAILO),
+            poj = Romanization.render(phraseSyllables(syllables, input), RomanSystem.POJ),
             numeric = numeric,
             consumed = input.last().rawEnd,
             score = coverage + phrase.score + neutral + history.boost(hanlo, numeric),
             entries = words,
+            toneConflict = input.zip(syllables.flatten()).any { (typed, actual) ->
+                typed.tone != Syllable.TONE_UNSPECIFIED && typed.tone != actual.withImplicitTone().tone
+            },
         )
+    }
+
+    /**
+     * [syllables] with the separators the user typed: a typed `--` always marks neutral tone, and a
+     * typed `-` joins syllables the dictionary or phrase would separate with a space. (A plain `-`
+     * is often just a syllable separator, so it doesn't override the dictionary's `--`.)
+     */
+    private fun withTypedBoundaries(syllables: List<Syllable>, input: List<InputSyllable>): List<Syllable> =
+        syllables.mapIndexed { i, s ->
+            val typed = input[i]
+            when {
+                i == 0 || !typed.separated -> s
+                typed.boundary == Boundary.NEUTRAL -> s.copy(boundary = Boundary.NEUTRAL)
+                s.boundary == Boundary.SPACE -> s.copy(boundary = Boundary.HYPHEN)
+                else -> s
+            }
+        }
+
+    /** A phrase's syllables: words separated by spaces, unless the user typed separators. */
+    private fun phraseSyllables(words: List<List<Syllable>>, input: List<InputSyllable>): List<Syllable> {
+        val flat = words.flatMap { word -> word.mapIndexed { i, s -> if (i == 0) s.copy(boundary = Boundary.SPACE) else s } }
+        return withTypedBoundaries(flat, input)
     }
 
     private fun joinHanlo(words: List<String>): String = buildString {
@@ -256,6 +294,15 @@ class CandidateEngine(
             }
         }
         val numeric = segmentation?.joinToString("-") { if (it.kind == InputSyllable.Kind.COMPLETE) it.toSyllable().toNumeric() else it.raw } ?: raw
+        // Fully toned input is exactly what the user wants written: rank it just below dictionary
+        // words with the same tones and above any whose tones contradict the input.
+        val literal = segmentation != null &&
+            segmentation.all { it.kind == InputSyllable.Kind.COMPLETE && it.tone != Syllable.TONE_UNSPECIFIED }
+        val score = if (literal) {
+            FULL_MATCH + segmentation!!.size * (EXACT_SPELLING + TONE_MATCH) - 1
+        } else {
+            ROMAN_CANDIDATE
+        }
         return Candidate(
             hanlo = null,
             hanloPoj = null,
@@ -263,7 +310,8 @@ class CandidateEngine(
             poj = render(RomanSystem.POJ),
             numeric = numeric,
             consumed = raw.length,
-            score = ROMAN_CANDIDATE + history.boost(null, numeric),
+            score = score + history.boost(null, numeric),
+            literal = literal,
         )
     }
 

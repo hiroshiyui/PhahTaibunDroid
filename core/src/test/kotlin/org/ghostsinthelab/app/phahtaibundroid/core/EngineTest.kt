@@ -3,6 +3,7 @@ package org.ghostsinthelab.app.phahtaibundroid.core
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.Composer
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.FrequencyHistory
+import org.ghostsinthelab.app.phahtaibundroid.core.engine.InputSyllable
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Lexicon
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.LexiconEntry
@@ -105,6 +106,43 @@ class EngineTest {
         assertEquals("ta̍k-ke-hó", top.tailo)
         // Mixed-up entering-tone codas match too.
         assertEquals("逐家好", loose.candidates("tatkeho").first().hanlo)
+    }
+
+    @Test
+    fun fullyTonedInputIsWrittenAsTyped() {
+        // Hàn-lô mode: words agreeing with every typed tone first, then the input as typed.
+        val hanlo = Composer(engine).apply { "tai5gi2".forEach(::type) }.displayCandidates().map { it.text }
+        assertEquals("台語", hanlo[0])
+        assertTrue(hanlo.toString(), hanlo.indexOf("tâi-gí") < hanlo.indexOf("台"))
+        // Tones the dictionary doesn't have: nothing agrees, so the input as typed leads.
+        assertEquals("tài-gī", Composer(engine).apply { "tai3gi7".forEach(::type) }.displayCandidates().first().text)
+        // Romanization mode: always exactly as typed, lower case included.
+        val roman = Composer(engine, mode = OutputMode.ROMAN).apply { "tai5gi2".forEach(::type) }
+        assertEquals("tâi-gí", roman.displayCandidates().first().text)
+        assertEquals("tâi-gí", roman.commitFirst())
+        // Untoned (or partly toned) input still gets its tones from the dictionary.
+        assertEquals("Tâi-gí", Composer(engine, mode = OutputMode.ROMAN).apply { "taigi".forEach(::type) }.displayCandidates().first().text)
+        assertEquals("Tâi-gí", Composer(engine, mode = OutputMode.ROMAN).apply { "tai5gi".forEach(::type) }.displayCandidates().first().text)
+    }
+
+    @Test
+    fun switchingToRomanizationPutsExactInputFirst() {
+        val composer = Composer(engine)
+        "tai5gi2".forEach(composer::type)
+        assertEquals("台語", composer.displayCandidates().first().text)
+        composer.mode = OutputMode.ROMAN
+        assertEquals("tâi-gí", composer.displayCandidates().first().text)
+    }
+
+    @Test
+    fun tonedSyllablesOutsideTheDictionaryAreAccepted() {
+        // hiunnh is no dictionary syllable here, but a tone number delimits it.
+        val seg = engine.segment("hiunnh8").first()
+        assertEquals(listOf("hiunnh"), seg.map { it.base })
+        assertEquals("hiu̍nnh", Composer(engine, mode = OutputMode.ROMAN).apply { "hiunnh8".forEach(::type) }.commitFirst())
+        assertEquals("hiu̍ⁿh", Composer(engine, RomanSystem.POJ, OutputMode.ROMAN).apply { "hiunnh8".forEach(::type) }.commitFirst())
+        // Without a tone, unknown letters are not taken for a syllable.
+        assertTrue(engine.segment("hiunnh").first().none { it.base == "hiunnh" && it.kind == InputSyllable.Kind.COMPLETE })
     }
 
     @Test

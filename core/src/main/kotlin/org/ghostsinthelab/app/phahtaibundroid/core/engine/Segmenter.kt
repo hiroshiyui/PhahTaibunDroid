@@ -22,6 +22,8 @@ data class InputSyllable(
     val tone: Int,
     val boundary: Boundary,
     val kind: Kind,
+    /** The user typed a separator (`-`, `--`, a space…) before this syllable, so [boundary] is theirs. */
+    val separated: Boolean = false,
 ) {
     enum class Kind {
         /** A syllable known to the lexicon. */
@@ -61,7 +63,7 @@ data class InputSyllable(
  */
 class Segmenter(private val lexicon: Lexicon) {
 
-    private data class Run(val text: String, val start: Int, val end: Int, val tone: Int, val boundary: Boundary)
+    private data class Run(val text: String, val start: Int, val end: Int, val tone: Int, val boundary: Boundary, val separated: Boolean)
 
     fun segment(raw: String, maxResults: Int = MAX_SEGMENTATIONS): List<List<InputSyllable>> {
         val runs = splitRuns(raw)
@@ -89,14 +91,17 @@ class Segmenter(private val lexicon: Lexicon) {
         val runs = ArrayList<Run>()
         var i = 0
         var boundary = Boundary.HYPHEN
+        var separated = false
         while (i < raw.length) {
             val c = raw[i]
             if (!c.isRunChar()) {
                 if (c == '-' && raw.startsWith("--", i)) {
                     boundary = Boundary.NEUTRAL
+                    separated = true
                     i += 2
                 } else {
                     // Stray digits/separators: absorb into the previous run so offsets stay contiguous.
+                    if (!c.isDigit()) separated = true
                     i++
                 }
                 if (runs.isNotEmpty()) runs[runs.lastIndex] = runs.last().copy(end = i)
@@ -110,8 +115,9 @@ class Segmenter(private val lexicon: Lexicon) {
                 tone = raw[i] - '0'
                 i++
             }
-            runs += Run(text, start, i, tone, boundary)
+            runs += Run(text, start, i, tone, boundary, separated && runs.isNotEmpty())
             boundary = Boundary.HYPHEN
+            separated = false
         }
         return runs
     }
@@ -139,7 +145,9 @@ class Segmenter(private val lexicon: Lexicon) {
                 if (!reachable[j]) continue
                 val s = t.substring(i, j)
                 val kind = (if (abbreviate) classifyAbbreviation(s) else null)
-                    ?: classify(s, partialAllowed = allowPartial && j == n) ?: continue
+                    ?: classify(s, partialAllowed = allowPartial && j == n)
+                    ?: (if (!abbreviate && i == 0 && j == n) classifyToned(s, run) else null)
+                    ?: continue
                 pieces[i] += j to kind
                 reachable[i] = true
             }
@@ -183,6 +191,16 @@ class Segmenter(private val lexicon: Lexicon) {
     private fun classifyAbbreviation(s: String): InputSyllable.Kind? =
         if (s.all { it in CONSONANTS } && SyllablePatterns.abbreviation(lexicon, s) != null) InputSyllable.Kind.INITIAL else null
 
+    /**
+     * A syllable the dictionary doesn't use, accepted when the user delimited it with a tone
+     * (`hiunnh8`, `phoenn7`) and spelled it validly: someone who types tones knows the spelling.
+     */
+    private fun classifyToned(s: String, run: Run): InputSyllable.Kind? {
+        val parsed = parseTyped(s) ?: return null
+        val toned = run.tone != Syllable.TONE_UNSPECIFIED || parsed.tone != Syllable.TONE_UNSPECIFIED
+        return if (toned && Romanization.isValidBase(parsed.base)) InputSyllable.Kind.COMPLETE else null
+    }
+
     /** Returns how [s] can be used as a syllable, or `null` if it cannot. */
     private fun classify(s: String, partialAllowed: Boolean): InputSyllable.Kind? {
         if (SyllablePatterns.WILDCARD in s) {
@@ -215,6 +233,7 @@ class Segmenter(private val lexicon: Lexicon) {
             tone = if (isLast && run.tone != Syllable.TONE_UNSPECIFIED) run.tone else parsed?.tone ?: Syllable.TONE_UNSPECIFIED,
             boundary = if (i == 0) run.boundary else Boundary.HYPHEN,
             kind = kind,
+            separated = i == 0 && run.separated,
         )
     }
 
