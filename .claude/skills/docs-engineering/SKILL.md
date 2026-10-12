@@ -6,7 +6,7 @@ argument-hint: task description
 
 # Document Engineering
 
-You are performing documentation tasks for Phah Taibun (拍台文), a Taigi (台語) input method.
+You are performing documentation tasks for Phah Taibun Droid (拍台文), a Taigi (台語) input method.
 
 ## Bilingual Convention
 

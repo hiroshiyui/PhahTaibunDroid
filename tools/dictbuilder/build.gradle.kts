@@ -19,7 +19,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("org.ghostsinthelab.app.phahtaibun.dictbuilder.MainKt")
+    mainClass.set("org.ghostsinthelab.app.phahtaibundroid.dictbuilder.MainKt")
 }
 
 dependencies {

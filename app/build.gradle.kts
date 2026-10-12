@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "org.ghostsinthelab.app.phahtaibun"
+    namespace = "org.ghostsinthelab.app.phahtaibundroid"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "org.ghostsinthelab.app.phahtaibun"
+        applicationId = "org.ghostsinthelab.app.phahtaibundroid"
         minSdk = 26
         targetSdk = 37
         versionCode = 1

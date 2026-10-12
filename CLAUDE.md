@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Phah Taibun (拍台文) is an Android IME for Taigi (台語, Taiwanese Hokkien). It accepts POJ (白話字) and Tâi-lô (台羅) — mixed freely, with or without tones — and fuzzy/ambiguous spellings, and outputs either Hàn-lô (漢字/漢羅) or romanization. The user toggles output by tapping the input-buffer bar or swiping the candidate strip up/down. Licensed GPL-3.0-or-later.
+Phah Taibun Droid (拍台文) is an Android IME for Taigi (台語, Taiwanese Hokkien). It accepts POJ (白話字) and Tâi-lô (台羅) — mixed freely, with or without tones — and fuzzy/ambiguous spellings, and outputs either Hàn-lô (漢字/漢羅) or romanization. The user toggles output by tapping the input-buffer bar or swiping the candidate strip up/down. Licensed GPL-3.0-or-later.
 
 ## Commands
 
 ```sh
 ./gradlew :core:test                    # engine unit tests (pure JVM, fast) — most logic lives here
-./gradlew :core:test --tests "org.ghostsinthelab.app.phahtaibun.core.EngineTest"            # one class
-./gradlew :core:test --tests "org.ghostsinthelab.app.phahtaibun.core.EngineTest.convertsUnseparatedInput"
-./gradlew :app:assembleDebug            # APK → app/build/outputs/apk/debug/org.ghostsinthelab.app.phahtaibun_v<ver>-debug.apk
+./gradlew :core:test --tests "org.ghostsinthelab.app.phahtaibundroid.core.EngineTest"            # one class
+./gradlew :core:test --tests "org.ghostsinthelab.app.phahtaibundroid.core.EngineTest.convertsUnseparatedInput"
+./gradlew :app:assembleDebug            # APK → app/build/outputs/apk/debug/org.ghostsinthelab.app.phahtaibundroid_v<ver>-debug.apk
 ./gradlew :app:lintDebug
 ./gradlew bumpPatchVersion              # versionCode+1, patch+1 in app/build.gradle.kts
 
@@ -22,8 +22,8 @@ Phah Taibun (拍台文) is an Android IME for Taigi (台語, Taiwanese Hokkien).
 
 Testing the IME on a device/emulator:
 ```sh
-adb shell ime enable org.ghostsinthelab.app.phahtaibun/.ime.PhahTaibunInputMethodService
-adb shell ime set    org.ghostsinthelab.app.phahtaibun/.ime.PhahTaibunInputMethodService
+adb shell ime enable org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
+adb shell ime set    org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
 adb shell settings put secure show_ime_with_hard_keyboard 1   # emulators report a hardware keyboard, which hides soft IMEs
 ```
 `MainActivity` (setup + settings) has a "Try it" text field for testing.

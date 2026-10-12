@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Phah Taibun"
+rootProject.name = "Phah Taibun Droid"
 include(":app")
 include(":core")
 include(":tools:dictbuilder")

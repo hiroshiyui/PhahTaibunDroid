@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-    android:settingsActivity="org.ghostsinthelab.app.phahtaibun.MainActivity"
+    android:settingsActivity="org.ghostsinthelab.app.phahtaibundroid.MainActivity"
     android:supportsSwitchingToNextInputMethod="true">
     <subtype
         android:imeSubtypeLocale="nan_TW"

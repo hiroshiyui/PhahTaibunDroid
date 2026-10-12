@@ -6,7 +6,7 @@ argument-hint: commit message or description of changes
 
 # Commit and Push
 
-You are committing and pushing code changes for Phah Taibun.
+You are committing and pushing code changes for Phah Taibun Droid.
 
 ## Commit Message Convention
 

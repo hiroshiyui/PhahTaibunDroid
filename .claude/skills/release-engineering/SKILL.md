@@ -6,7 +6,7 @@ argument-hint: task description
 
 # Release Engineering
 
-You are performing release engineering tasks for Phah Taibun.
+You are performing release engineering tasks for Phah Taibun Droid.
 
 ## Version Scheme
 
@@ -73,7 +73,7 @@ fastlane/metadata/android/zh-TW/changelogs/<versionCode>.txt
 
 GPG signing requires interactive passphrase entry — **do not run `gpg` commands automatically**. Instead, prompt the user to sign the APKs manually with the commands below.
 
-The APK filename follows the pattern `org.ghostsinthelab.app.phahtaibun_v<versionName>-<buildType>.apk` (configured by the `archivesName` setting in `app/build.gradle.kts`).
+The APK filename follows the pattern `org.ghostsinthelab.app.phahtaibundroid_v<versionName>-<buildType>.apk` (configured by the `archivesName` setting in `app/build.gradle.kts`).
 
 Provide the user with the exact commands to run:
 ```bash
@@ -82,8 +82,8 @@ gpg --detach-sign --armor <apk-file>
 
 For example, from the project root:
 ```bash
-gpg --detach-sign --armor app/build/outputs/apk/release/org.ghostsinthelab.app.phahtaibun_v0.1.1-release.apk
-gpg --detach-sign --armor app/build/outputs/apk/debug/org.ghostsinthelab.app.phahtaibun_v0.1.1-debug.apk
+gpg --detach-sign --armor app/build/outputs/apk/release/org.ghostsinthelab.app.phahtaibundroid_v0.1.1-release.apk
+gpg --detach-sign --armor app/build/outputs/apk/debug/org.ghostsinthelab.app.phahtaibundroid_v0.1.1-debug.apk
 ```
 
 Wait for the user to confirm signing is complete before proceeding to the GitHub Release step.
@@ -127,10 +127,10 @@ EOF
 ```
 
 Upload **both** debug and release APKs along with their `.asc` signature files (4 assets total), all from `app/build/outputs/apk/{debug,release}/`:
-- `org.ghostsinthelab.app.phahtaibun_v<version>-debug.apk`
-- `org.ghostsinthelab.app.phahtaibun_v<version>-debug.apk.asc`
-- `org.ghostsinthelab.app.phahtaibun_v<version>-release.apk`
-- `org.ghostsinthelab.app.phahtaibun_v<version>-release.apk.asc`
+- `org.ghostsinthelab.app.phahtaibundroid_v<version>-debug.apk`
+- `org.ghostsinthelab.app.phahtaibundroid_v<version>-debug.apk.asc`
+- `org.ghostsinthelab.app.phahtaibundroid_v<version>-release.apk`
+- `org.ghostsinthelab.app.phahtaibundroid_v<version>-release.apk.asc`
 
 The release title matches the tag/versionName (e.g. `0.1.1`).
 

@@ -2,7 +2,7 @@
 >
 >**⚠️ 開發中：** 本專案仍在積極開發階段，目前尚不適合日常輸入使用。功能、行為與辭典內容都可能隨時變動，也尚未提供任何正式釋出版本。
 
-# Phah Taibun 拍台文
+# Phah Taibun Droid 拍台文
 
 ## About 這是啥
 
@@ -28,9 +28,9 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 ## Usage 使用
 
-After installing, open **Phah Taibun** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, and which fuzzy-matching rules to use.
+After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, and which fuzzy-matching rules to use.
 
-安裝後，請從桌面開啟「Phah Taibun」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式，以及要使用的模糊比對規則。
+安裝後，請從桌面開啟「Phah Taibun Droid」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式，以及要使用的模糊比對規則。
 
 | Key 按鍵 | Action 功能 |
 |---|---|

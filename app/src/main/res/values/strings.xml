@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Phah Taibun</string>
-    <string name="ime_name">Phah Taibun 拍台文</string>
+    <string name="app_name">Phah Taibun Droid</string>
+    <string name="ime_name">Phah Taibun Droid 拍台文</string>
     <string name="subtype_taigi">Taigi (POJ / Tâi-lô)</string>
 
     <string name="keyboard_loading">Loading dictionary…</string>
@@ -8,8 +8,8 @@
 
     <string name="settings_intro">A Taigi keyboard that understands both POJ (Pe̍h-ōe-jī) and Tâi-lô. Type without tone marks — they are filled in for you — and switch between Hàn-lô and romanization at any time.</string>
     <string name="settings_setup">Setup</string>
-    <string name="settings_enable">1. Enable Phah Taibun</string>
-    <string name="settings_select">2. Switch to Phah Taibun</string>
+    <string name="settings_enable">1. Enable Phah Taibun Droid</string>
+    <string name="settings_select">2. Switch to Phah Taibun Droid</string>
     <string name="settings_done">Done</string>
     <string name="settings_roman_system">Romanization</string>
     <string name="settings_roman_system_desc">Spelling used for romanized output and for romanized parts of Hàn-lô.</string>

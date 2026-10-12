@@ -6,7 +6,7 @@ argument-hint: file path, component name, or scope of review
 
 # Code Review and Security Audit
 
-You are performing code review and security auditing for Phah Taibun.
+You are performing code review and security auditing for Phah Taibun Droid.
 
 ## Scope
 
