@@ -52,6 +52,8 @@ object Romanization {
      */
     fun canonicalBase(spelling: String): String {
         var b = spelling.replace("ou", "oo")
+        // ASCII POJ for ṳ/o̤/o̤e (Tâi-lô ir/er/ere); Tâi-lô itself never spells ur/or.
+        b = b.replace("ore", "ere").replace("or", "er").replace("ur", "ir")
         b = when {
             b.startsWith("chh") -> "tsh" + b.substring(3)
             b.startsWith("ch") -> "ts" + b.substring(2)
@@ -183,8 +185,10 @@ object Romanization {
         }
         b = b.replace("ua", "oa").replace("ue", "oe")
         b = b.replace("oo", "o$DOT_ABOVE_RIGHT")
+        // POJ writes the vowels Tâi-lô spells ir/er (and the diphthong ere) as ṳ/o̤ (o̤e).
+        b = b.replace("ere", "o${DIAERESIS_BELOW}e").replace("er", "o$DIAERESIS_BELOW").replace("ir", "u$DIAERESIS_BELOW")
         // Nasalization: `nn` directly after a vowel. (The `nn` of e.g. `nng` is an initial + rime.)
-        b = b.replace(Regex("(?<=[aeiou͘])nn"), SUPERSCRIPT_N.toString())
+        b = b.replace(Regex("(?<=[aeioṳ͘])nn"), SUPERSCRIPT_N.toString())
         return b
     }
 
@@ -213,8 +217,8 @@ object Romanization {
     internal fun toneMarkIndex(spelled: String, system: RomanSystem): Int {
         fun idx(c: Char) = spelled.indexOf(c).takeIf { it >= 0 }
         if (system == RomanSystem.POJ) {
-            // Traditional POJ: open `oa`/`oe` (optionally nasal) mark the o; otherwise the a/e.
-            Regex("o[ae]").find(spelled)?.let { m ->
+            // Traditional POJ: open `oa`/`oe`/`o̤e` (optionally nasal) mark the o; otherwise the a/e.
+            Regex("o$DIAERESIS_BELOW?[ae]").find(spelled)?.let { m ->
                 val after = spelled.substring(m.range.last + 1)
                 return if (after.isEmpty() || after == "ⁿ") m.range.first else m.range.last
             }

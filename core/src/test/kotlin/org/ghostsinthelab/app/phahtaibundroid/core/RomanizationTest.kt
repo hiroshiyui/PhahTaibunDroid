@@ -92,9 +92,15 @@ class RomanizationTest {
         // numeric input → Tâi-lô, POJ
         val rendered = listOf(
             // Tâi-lô `ere` marks the second e (MOE handbook: erê 鞋); KeSi agrees, we used to mark the first.
-            Triple("ere5", "erê", "êre"),
-            Triple("kere1-nng6", "kere-nňg", "kere-nňg"),
-            Triple("tsere8", "tsere̍", "che̍re"),
+            // POJ writes ir/er/ere as ṳ/o̤/o̤e (iTaigi's POJ), marking o̤ in an open o̤e; KeSi keeps êre.
+            Triple("ere5", "erê", "ô̤e"),
+            Triple("kere1-nng6", "kere-nňg", "ko̤e-nňg"),
+            Triple("tsere8", "tsere̍", "cho̤̍e"),
+            Triple("sere3", "serè", "sò̤e"),
+            Triple("sir2", "sír", "sṳ́"),
+            Triple("sirh8", "si̍rh", "sṳ̍h"),
+            Triple("ker1", "ker", "ko̤"),
+            Triple("kher2", "khér", "khó̤"),
             // POJ marks the a of `au` even before a final h (台華線頂對照典 tha̍uh); KeSi writes thau̍h.
             Triple("thauh8", "tha̍uh", "tha̍uh"),
             Triple("haunnh8", "ha̍unnh", "ha̍uⁿh"),
@@ -121,6 +127,10 @@ class RomanizationTest {
             "khṳ̀" to "khir3",
             "Ṳ" to "Ir",
             "o̤" to "er",
+            // ASCII POJ for them (iTaigi's POJ input): ur / or / ore.
+            "sur2" to "sir2",
+            "khor2" to "kher2",
+            "kore1" to "kere1",
             "pe̍h-ōe-jī" to "peh8-ue7-ji7",
         )
         for ((text, numeric) in parsed) assertEquals(text, numeric, numeric(text))

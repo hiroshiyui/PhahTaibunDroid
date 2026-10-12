@@ -22,7 +22,7 @@ Known gaps and planned work. Check items off (or remove them) as they land, and 
 - [ ] A trailing `?` while composing is now a wildcard, so ending a sentence with `?` needs a commit first; consider treating `?` followed by space/enter as punctuation.
 - [x] Bigram (word-pair) support and whole-input phrase candidates, so long input converts in one go (e.g. `tsuekinthinnkhitsinho` → 最近天氣真好). The bundled `bigrams.tsv` is empty until a usable corpus is found.
 - [x] Cross-check `Romanization` against [KeSi](https://github.com/i3thuan5/KeSi) (MIT), an established POJ↔TL converter, by turning disagreements into test cases.
-- [ ] Decide whether POJ output should write Tâi-lô `ir`/`er` as `ṳ`/`o̤` (as the Taihoa POJ data does) instead of `ir`/`er`.
+- [x] POJ output writes Tâi-lô `ir`/`er`/`ere` as `ṳ`/`o̤`/`o̤e`, following iTaigi's POJ; ASCII `ur`/`or`/`ore` are accepted as input. Each system follows its own conventions.
 
 ## Data
 

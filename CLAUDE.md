@@ -51,7 +51,8 @@ Three Gradle modules; dependencies flow `app → core ← tools:dictbuilder`.
 ## Conventions and constraints
 
 - Put new input logic in `:core` with tests, not in the service or UI.
-- Romanized text: compare in canonical/NFD-aware form, output NFC. `o͘` uses U+0358; POJ nasal is `ⁿ` (U+207F), written before a final `h` (`hiaⁿh`).
+- Romanized text: compare in canonical/NFD-aware form, output NFC. `o͘` uses U+0358; POJ nasal is `ⁿ` (U+207F), written before a final `h` (`hiaⁿh`). POJ writes Tâi-lô `ir`/`er`/`ere` as `ṳ`/`o̤`/`o̤e` (U+0324; ASCII `ur`/`or`/`ore` on input).
+- POJ and Tâi-lô are equals: output in either system follows that system's own conventions, never the other's spellings (users of the two systems care about this).
 - Only permissively licensed dictionary data may be bundled (currently Taihoa 台華線頂對照典 CC BY-SA 4.0, iTaigi CC0). iCorpus 臺華平行新聞語料庫 traces back to CC BY-NC-SA 4.0 data, so nothing derived from it may be committed. ChhoeTaigi's other datasets are NonCommercial or NoDerivatives — don't add them.
 - Every external/third-party resource (library, dataset, font, icon, tool) must have its copyright and license recorded in the root `NOTICE` file.
 - Commits: plain imperative subject, `--signoff`, and **no Claude/AI attribution** of any kind (see `.claude/skills/commit-and-push`).
