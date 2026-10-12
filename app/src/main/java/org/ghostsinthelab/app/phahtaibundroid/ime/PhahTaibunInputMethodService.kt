@@ -65,6 +65,12 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
     private var composer: Composer? = null
     private var composingShown = false
 
+    /**
+     * Emulators report the host's keyboard as a hardware keyboard, which hides soft keyboards
+     * unless "Show on-screen keyboard" is turned on in system settings. Always show ours there.
+     */
+    override fun onEvaluateInputViewShown(): Boolean = super.onEvaluateInputViewShown() || isEmulator
+
     override fun onCreate() {
         super.onCreate()
         savedStateController.performRestore(null)
@@ -291,6 +297,9 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
     private val windowToken get() = window?.window?.attributes?.token
 
     private companion object {
+        val isEmulator = Build.HARDWARE == "ranchu" || Build.HARDWARE == "goldfish" ||
+            Build.BOARD.startsWith("goldfish_")
+
         /** Punctuation typed while writing Hàn-lô uses full-width forms. */
         val FULL_WIDTH = mapOf(
             "," to "，", "." to "。", "?" to "？", "!" to "！", ":" to "：", ";" to "；",

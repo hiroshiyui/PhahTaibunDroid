@@ -24,8 +24,8 @@ Testing the IME on a device/emulator:
 ```sh
 adb shell ime enable org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
 adb shell ime set    org.ghostsinthelab.app.phahtaibundroid/.ime.PhahTaibunInputMethodService
-adb shell settings put secure show_ime_with_hard_keyboard 1   # emulators report a hardware keyboard, which hides soft IMEs
 ```
+On emulators the service always shows its keyboard (`onEvaluateInputViewShown`), even though the host keyboard counts as a hardware keyboard, so the "Show on-screen keyboard" setting isn't needed.
 `MainActivity` (setup + settings) has a "Try it" text field for testing.
 
 ## Architecture
