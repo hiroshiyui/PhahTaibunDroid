@@ -10,3 +10,5 @@ build/
 local.properties
 /data/sources/
 /.claude/worktrees/
+/app/debug/
+/app/release/
