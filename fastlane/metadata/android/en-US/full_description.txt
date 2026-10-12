@@ -4,7 +4,11 @@ Type in POJ (Pe̍h-ōe-jī) or Tâi-lô, or mix them freely, and I'll give you H
 
 * No tone marks needed: type "taigi" and pick 台語 or Tâi-gí. Tone numbers ("tai5gi2") narrow the candidates when you want them to.
 
-* No syllable separators needed: "lihokamsia" becomes 你好 感謝, and you can convert it piece by piece.
+* No syllable separators needed: "lihokamsia" becomes 你好 感謝, a whole sentence like "tsuekinthinnkhitsinho" can come out as 最近天氣真好 in one go, and you can also convert piece by piece.
+
+* Shortcuts: one letter per syllable ("tg" → 台語), or "?" for letters you're unsure of ("s?ah").
+
+* Know your romanization? Give every syllable a tone number ("a1-ma2") and I'll write exactly what you typed, even words my dictionary doesn't know. POJ is written the POJ way and Tâi-lô the Tâi-lô way.
 
 * Tap the input bar, or swipe the candidate bar up or down, to switch between Hàn-lô and romanization at any time.
 
