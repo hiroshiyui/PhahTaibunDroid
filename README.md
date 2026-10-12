@@ -1,3 +1,7 @@
+>**⚠️ Work in progress:** This project is under active development and is not yet useful for everyday typing. Features, behavior and the dictionary may change without notice, and no release is available.
+>
+>**⚠️ 開發中：** 本專案仍在積極開發階段，目前尚不適合日常輸入使用。功能、行為與辭典內容都可能隨時變動，也尚未提供任何正式釋出版本。
+
 # Phah Taibun 拍台文
 
 ## About 這是啥
@@ -5,10 +9,6 @@
 An Android software keyboard (input method editor) for [Taigi](https://en.wikipedia.org/wiki/Taiwanese_Hokkien) (台語, Taiwanese Hokkien). Type in either [POJ (Pe̍h-ōe-jī, 白話字)](https://en.wikipedia.org/wiki/Pe%CC%8Dh-%C5%8De-j%C4%AB) or [Tâi-lô (台羅)](https://en.wikipedia.org/wiki/Taiwanese_Romanization_System) — or a mix of both — and get Hàn-lô (漢羅, Han characters mixed with romanization) or properly tone-marked romanization.
 
 拍台文是 Android 平台上的[台語](https://zh.wikipedia.org/zh-tw/%E8%87%BA%E7%81%A3%E8%A9%B1)軟體鍵盤（輸入法編輯器）。您可以用[白話字（POJ）](https://zh.wikipedia.org/zh-tw/%E7%99%BD%E8%A9%B1%E5%AD%97)或[台羅（Tâi-lô）](https://zh.wikipedia.org/zh-tw/%E8%87%BA%E7%81%A3%E9%96%A9%E5%8D%97%E8%AA%9E%E7%BE%85%E9%A6%AC%E5%AD%97%E6%8B%BC%E9%9F%B3%E6%96%B9%E6%A1%88)輸入，兩者混用也可以，輸出漢羅（漢字與羅馬字混寫）或標好聲調符號的羅馬字。
-
-This project is in early development and has not been released yet.
-
-本專案仍在早期開發階段，尚未正式釋出。
 
 ## Features 特色
 
