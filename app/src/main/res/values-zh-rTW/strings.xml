@@ -24,6 +24,9 @@
     <string name="settings_enable">1. 啟用拍台文</string>
     <string name="settings_select">2. 切換至拍台文</string>
     <string name="settings_done">完成</string>
+    <string name="settings_language">語言</string>
+    <string name="settings_language_desc">本程式畫面與鍵盤標籤所使用的語言。台語只能在這裡選擇，因為系統設定只列出 Android 本身支援的語言。</string>
+    <string name="language_system">跟隨系統設定</string>
     <string name="settings_roman_system">羅馬字系統</string>
     <string name="settings_roman_system_desc">羅馬字輸出及漢羅中羅馬字部分所使用的拼寫。</string>
     <string name="settings_poj">白話字（POJ）</string>

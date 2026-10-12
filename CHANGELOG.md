@@ -18,7 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Lexicon of 86,340 entries compiled from ChhoeTaigi datasets: 台文華文線頂辭典 (CC BY-SA 4.0) and iTaigi 華台對照典 (CC0).
 - Setup and settings screen (romanization system, default output, fuzzy rules), in English and Traditional Chinese.
 - Screen-reader labels for the keyboard's symbol keys (shift, delete, space, enter, layer and input-method switch), in English and Traditional Chinese.
-- Per-app language: English or Traditional Chinese can be chosen in the system's App info → Language (Android 13+), independently of the device language.
+- Per-app language (Android 13+), independently of the device language: English or Traditional Chinese in the system's App info → Language, or those and Taigi in the app's own settings.
+- Taigi UI in Hàn-lô (`nan-Hant-TW`). Android's settings don't list `nan`, so it is chosen in the app; the keyboard follows a language change without restarting.
 - GPL-3.0-or-later license, third-party `NOTICE`, and bilingual `README.md`.
 
 ### Changed

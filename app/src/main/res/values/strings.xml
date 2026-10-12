@@ -25,6 +25,13 @@
     <string name="settings_enable">1. Enable Phah Taibun Droid</string>
     <string name="settings_select">2. Switch to Phah Taibun Droid</string>
     <string name="settings_done">Done</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_desc">Language of this app\'s screens and keyboard labels. Taigi is only offered here, as system settings list only languages Android itself supports.</string>
+    <string name="language_system">System default</string>
+    <!-- Language names, each written in its own language. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_zh_tw" translatable="false">繁體中文（台灣）</string>
+    <string name="language_nan_hant_tw" translatable="false">台語（漢羅）</string>
     <string name="settings_roman_system">Romanization</string>
     <string name="settings_roman_system_desc">Spelling used for romanized output and for romanized parts of Hàn-lô.</string>
     <string name="settings_poj">POJ (白話字)</string>

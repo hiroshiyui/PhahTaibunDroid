@@ -1,12 +1,16 @@
 package org.ghostsinthelab.app.phahtaibundroid
 
+import android.app.LocaleManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.LocaleList
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -103,6 +107,8 @@ private fun SettingsScreen(prefs: ImePreferences) {
             SetupSection()
             HorizontalDivider()
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) LanguageSection()
+
             Section(R.string.settings_roman_system, R.string.settings_roman_system_desc)
             Choice(R.string.settings_poj, system == RomanSystem.POJ) {
                 system = RomanSystem.POJ; prefs.romanSystem = system
@@ -169,6 +175,31 @@ private fun SetupSection() {
     }
     SetupStep(R.string.settings_select, done = selected, available = enabled) {
         imm.showInputMethodPicker()
+    }
+}
+
+/** UI languages offered in-app, by BCP 47 tag; an empty tag follows the system. */
+private val LANGUAGES = listOf(
+    "" to R.string.language_system,
+    "en-US" to R.string.language_en,
+    "zh-TW" to R.string.language_zh_tw,
+    "nan-Hant-TW" to R.string.language_nan_hant_tw,
+)
+
+/**
+ * Per-app UI language. System settings only list languages Android itself supports, which leaves
+ * out Taigi (`nan`), so the choice is offered here too. Changing it recreates the activity.
+ */
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Composable
+private fun LanguageSection() {
+    val localeManager = LocalContext.current.getSystemService(LocaleManager::class.java)
+    val current = localeManager.applicationLocales.toLanguageTags()
+    Section(R.string.settings_language, R.string.settings_language_desc)
+    for ((tag, label) in LANGUAGES) {
+        Choice(label, current == tag) {
+            localeManager.applicationLocales = LocaleList.forLanguageTags(tag)
+        }
     }
 }
 

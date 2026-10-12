@@ -54,4 +54,4 @@ Three Gradle modules; dependencies flow `app → core ← tools:dictbuilder`.
 - Every external/third-party resource (library, dataset, font, icon, tool) must have its copyright and license recorded in the root `NOTICE` file.
 - Commits: plain imperative subject, `--signoff`, and **no Claude/AI attribution** of any kind (see `.claude/skills/commit-and-push`).
 - Kotlin: AGP 9 built-in Kotlin for `:app` (don't add `org.jetbrains.kotlin.android`); JVM modules use `kotlin.jvm`. Dependencies go through `gradle/libs.versions.toml`. R8 keep rules live in `app/src/main/keepRules/`. Configuration cache is on — custom tasks must be compatible.
-- User-facing strings exist in `values/` (en) and `values-zh-rTW/` (Traditional Chinese, Mandarin wording).
+- User-facing strings exist in `values/` (en), `values-zh-rTW/` (Traditional Chinese, Mandarin wording) and `values-b+nan+Hant+TW/` (Taigi in Hàn-lô, MOE recommended characters). Android's settings don't list `nan`, so `MainActivity` has its own language picker (`LocaleManager`, API 33+), and the IME service builds its view from a context with the per-app locale.

@@ -1,0 +1,56 @@
+<resources>
+    <!-- Taigi (台語) in Hàn-lô, following the MOE recommended characters (教育部推薦用字). -->
+    <string name="app_name">拍台文</string>
+    <string name="ime_name">拍台文 Phah Taibun Droid</string>
+    <string name="subtype_taigi">台語（白話字／台羅）</string>
+
+    <string name="keyboard_loading">辭典當咧載入…</string>
+    <string name="keyboard_toggle_hint">點一下抑是上下滑 ↕ 來切換漢字／羅馬字</string>
+
+    <string name="key_shift">大寫</string>
+    <string name="key_delete">刪除</string>
+    <string name="key_switch_ime">切換輸入法</string>
+    <string name="key_space">空白</string>
+    <string name="key_layer_symbols">符號</string>
+    <string name="key_layer_letters">字母</string>
+    <string name="key_enter">換行</string>
+    <string name="key_go">去</string>
+    <string name="key_search">揣</string>
+    <string name="key_send">送出</string>
+    <string name="key_next">後一个</string>
+    <string name="key_done">完成</string>
+
+    <string name="settings_intro">仝時支援白話字（POJ）佮台羅的台語鍵盤。免拍聲調符號，會自動共你補起來；隨時攏會當佇漢羅佮羅馬字之間切換。</string>
+    <string name="settings_setup">設定</string>
+    <string name="settings_enable">1. 啟用拍台文</string>
+    <string name="settings_select">2. 切換做拍台文</string>
+    <string name="settings_done">完成</string>
+    <string name="settings_language">語言</string>
+    <string name="settings_language_desc">這个程式的畫面佮鍵盤標籤所用的語言。台語干焦會當佇遮揀，因為系統設定干焦列出 Android 本身有支援的語言。</string>
+    <string name="language_system">綴系統設定</string>
+    <string name="settings_roman_system">羅馬字系統</string>
+    <string name="settings_roman_system_desc">羅馬字輸出佮漢羅內底羅馬字部份所用的拼寫。</string>
+    <string name="settings_poj">白話字（POJ）</string>
+    <string name="settings_tailo">台羅（Tâi-lô）</string>
+    <string name="settings_output_mode">預設輸出</string>
+    <string name="settings_output_mode_desc">嘛會當佇鍵盤頂懸點輸入區，抑是上下滑候選字列來切換。</string>
+    <string name="settings_hanlo">漢羅（漢字）</string>
+    <string name="settings_roman">羅馬字</string>
+    <string name="settings_fuzzy">模糊比對</string>
+    <string name="settings_fuzzy_desc">接受無分下跤這寡差別的拼法。完全相仝的結果猶原排代先。</string>
+    <string name="fuzzy_o_oo">o ⇄ o͘／oo</string>
+    <string name="fuzzy_nasal">鼻化音會當省略（a ⇄ aⁿ）</string>
+    <string name="fuzzy_glottal_stop">字尾 h 會當省略（a ⇄ ah）</string>
+    <string name="fuzzy_entering_tone">入聲韻尾 p/t/k/h 會當省略抑是混用（ta ⇄ ta̍k ⇄ ta̍t）</string>
+    <string name="fuzzy_voicing">用拼音式的 b/g 代替 p/k（ba ⇄ pa、ge ⇄ ke）</string>
+    <string name="fuzzy_coda_m_n">韻尾 m ⇄ n（kam ⇄ kan）</string>
+    <string name="fuzzy_coda_n_ng">韻尾 n ⇄ ng（sin ⇄ sing）</string>
+    <string name="fuzzy_aspiration">無分送氣（p/ph、t/th、k/kh、ch/chh）</string>
+    <string name="fuzzy_ue_e">腔口：ue ⇄ e（kue／ke）</string>
+    <string name="fuzzy_i_u">腔口：i ⇄ u（gí／gú）</string>
+    <string name="fuzzy_inn_enn">腔口：iⁿ ⇄ eⁿ（chhiⁿ／chheⁿ）</string>
+    <string name="fuzzy_j_l">腔口：j ⇄ l（ji̍t／li̍t）</string>
+    <string name="settings_try">試看覓</string>
+    <string name="settings_about">關於</string>
+    <string name="settings_about_text">這个軟體用 GNU 通用公共授權條款第 3 版抑是後來的任何版本（GPL-3.0-or-later）授權。\n\n辭典資料來自 ChhoeTaigi 計畫：台文華文線頂辭典（鄭良偉、楊允言佮志工，CC BY-SA 4.0）佮 iTaigi 華台對照典（CC0）。</string>
+</resources>

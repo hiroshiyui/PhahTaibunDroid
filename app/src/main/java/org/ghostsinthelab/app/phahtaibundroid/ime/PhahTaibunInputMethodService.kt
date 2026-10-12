@@ -1,7 +1,11 @@
 package org.ghostsinthelab.app.phahtaibundroid.ime
 
+import android.app.LocaleManager
+import android.content.Context
+import android.content.res.Configuration
 import android.inputmethodservice.InputMethodService
 import android.os.Build
+import android.os.LocaleList
 import android.text.InputType
 import android.view.KeyEvent
 import android.view.View
@@ -89,7 +93,8 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             decor.setViewTreeLifecycleOwner(this)
             decor.setViewTreeSavedStateRegistryOwner(this)
         }
-        return ComposeView(this).apply {
+        viewLocales = appLocales()
+        return ComposeView(localizedContext()).apply {
             setContent {
                 PhahTaibunTheme {
                     KeyboardScreen(state, ::onKey)
@@ -100,6 +105,8 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        // The per-app language may have been changed (in our settings screen) since the view was built.
+        if (appLocales() != viewLocales) setInputView(onCreateInputView())
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         state.directInput = isDirectInput(info)
         learning = info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING == 0
@@ -273,6 +280,27 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             InputType.TYPE_TEXT_VARIATION_URI -> true
             else -> false
         }
+    }
+
+    /** Locales of the input view currently shown; see [localizedContext]. */
+    private var viewLocales: LocaleList? = null
+
+    /** The per-app language chosen by the user (Android 13+), or `null` to follow the system. */
+    private fun appLocales(): LocaleList? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getSystemService(LocaleManager::class.java).applicationLocales.takeUnless { it.isEmpty }
+        } else {
+            null
+        }
+
+    /**
+     * A context using the per-app language. A running service doesn't pick up a change of it
+     * until its process restarts, so apply it to the keyboard view explicitly.
+     */
+    private fun localizedContext(): Context {
+        val locales = viewLocales ?: return this
+        val config = Configuration(resources.configuration).apply { setLocales(locales) }
+        return createConfigurationContext(config)
     }
 
     // The InputMethodService versions of these exist from API 28; older releases only have the

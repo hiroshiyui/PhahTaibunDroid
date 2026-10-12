@@ -39,7 +39,8 @@ Candidates come largely from the resource list in the [寫台文 (rime-phah-taib
 
 ## Localization
 
-- [ ] Taigi UI locale (`nan-TW`) alongside English and Traditional Chinese.
+- [x] Taigi UI locale (`nan-Hant-TW`, Hàn-lô) alongside English and Traditional Chinese.
+- [ ] Per-app language on Android 8–12 (no `LocaleManager` there; would need AppCompat or manual context wrapping).
 
 ## Testing & release
 

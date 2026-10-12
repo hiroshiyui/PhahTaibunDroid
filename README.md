@@ -37,9 +37,9 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 ## Usage 使用
 
-After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, and which fuzzy-matching rules to use.
+After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, which fuzzy-matching rules to use, and, on Android 13 and later, the app's language: English, Traditional Chinese or Taigi in Hàn-lô (Taigi is only offered there, since Android's own settings list only languages the system supports).
 
-安裝後，請從桌面開啟「拍台文」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式，以及要使用的模糊比對規則。
+安裝後，請從桌面開啟「拍台文」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式、要使用的模糊比對規則，以及（Android 13 以上）介面語言：英文、繁體中文或台語漢羅。台語只能在這裡選擇，因為 Android 系統設定只列出系統本身支援的語言。
 
 | Key 按鍵 | Action 功能 |
 |---|---|

@@ -39,6 +39,13 @@ android {
         // under Settings → Apps → 拍台文 → Language (Android 13+).
         generateLocaleConfig = true
     }
+    bundle {
+        // The UI language can be switched in-app (Taigi is offered only there), so every
+        // language's resources must be installed, not just the device's.
+        language {
+            enableSplit = false
+        }
+    }
 }
 
 dependencies {
