@@ -1,8 +1,9 @@
 #!/bin/sh
 # Waits until an Android device or emulator is ready for instrumented tests or screenshots:
 # booted, boot animation finished, package manager and input-method service answering, screen
-# awake and unlocked, and no system dialog in front. `sys.boot_completed` alone is not enough;
-# on a cold emulator boot, services keep starting for a while after it.
+# awake and unlocked, no system dialog in front, and the post-boot burst of background work
+# over. `sys.boot_completed` alone is not enough; on a cold emulator boot, services keep
+# starting for a while after it.
 #
 # Usage: scripts/wait-for-device.sh [-s SERIAL] [-t TIMEOUT_SECONDS]
 # Without -s, ANDROID_SERIAL is used, else adb's default device (exactly one must be attached).
@@ -57,5 +58,21 @@ wait_until "an activity in front" \
 # focus that isn't an app or the launcher means it isn't ready yet.
 wait_until "no system dialog in front" \
     '! adb_ shell dumpsys window | grep -E "mCurrentFocus=.*(Application Not Responding|Application Error|NotResponding)"'
+
+# Shortly after boot, a burst of background work (app updates, indexing) can push the system
+# out of memory and get test processes killed. Wait until the 1-minute load average has stayed
+# below the number of CPUs for about 20 seconds; a single low reading can come just before it.
+cpus=$(adb_ shell nproc | tr -d '\r')
+calm=0
+while [ "$calm" -lt 5 ]; do
+    if [ "$(date +%s)" -ge "$deadline" ]; then
+        echo "timed out after ${timeout}s waiting for the system to settle" >&2
+        exit 1
+    fi
+    load=$(adb_ shell cat /proc/loadavg | cut -d' ' -f1)
+    if [ -n "$load" ] && awk -v l="$load" -v c="$cpus" 'BEGIN { exit !(l + 0 < c + 0) }'; then calm=$((calm + 1)); else calm=0; fi
+    sleep 4
+done
+echo "ready: the system has settled (load $load, $cpus CPUs)"
 
 echo "device ready${serial:+: $serial}"
