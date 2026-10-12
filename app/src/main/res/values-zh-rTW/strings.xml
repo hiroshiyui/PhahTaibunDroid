@@ -1,0 +1,33 @@
+<resources>
+    <string name="subtype_taigi">台語（白話字／台羅）</string>
+
+    <string name="keyboard_loading">辭典載入中…</string>
+    <string name="keyboard_toggle_hint">點選或上下滑動 ↕ 以切換漢字／羅馬字</string>
+
+    <string name="settings_intro">同時支援白話字（POJ）與台羅的台語鍵盤。不必輸入聲調符號，系統會自動補上；隨時可在漢羅與羅馬字之間切換。</string>
+    <string name="settings_setup">設定</string>
+    <string name="settings_enable">1. 啟用拍台文</string>
+    <string name="settings_select">2. 切換至拍台文</string>
+    <string name="settings_done">完成</string>
+    <string name="settings_roman_system">羅馬字系統</string>
+    <string name="settings_roman_system_desc">羅馬字輸出及漢羅中羅馬字部分所使用的拼寫。</string>
+    <string name="settings_poj">白話字（POJ）</string>
+    <string name="settings_tailo">台羅（Tâi-lô）</string>
+    <string name="settings_output_mode">預設輸出</string>
+    <string name="settings_output_mode_desc">也可以在鍵盤上點選輸入區，或上下滑動候選字列來切換。</string>
+    <string name="settings_hanlo">漢羅（漢字）</string>
+    <string name="settings_roman">羅馬字</string>
+    <string name="settings_fuzzy">模糊比對</string>
+    <string name="settings_fuzzy_desc">接受不區分以下差異的拼寫。完全相符的結果仍會優先排列。</string>
+    <string name="fuzzy_o_oo">o ⇄ o͘／oo</string>
+    <string name="fuzzy_nasal">鼻化音可省略（a ⇄ aⁿ）</string>
+    <string name="fuzzy_glottal_stop">字尾 h 可省略（a ⇄ ah）</string>
+    <string name="fuzzy_aspiration">不分送氣（p/ph、t/th、k/kh、ch/chh）</string>
+    <string name="fuzzy_ue_e">腔調：ue ⇄ e（kue／ke）</string>
+    <string name="fuzzy_i_u">腔調：i ⇄ u（gí／gú）</string>
+    <string name="fuzzy_inn_enn">腔調：iⁿ ⇄ eⁿ（chhiⁿ／chheⁿ）</string>
+    <string name="fuzzy_j_l">腔調：j ⇄ l（ji̍t／li̍t）</string>
+    <string name="settings_try">試用</string>
+    <string name="settings_about">關於</string>
+    <string name="settings_about_text">本軟體以 GNU 通用公共授權條款第 3 版或任何後續版本（GPL-3.0-or-later）授權。\n\n辭典資料來自 ChhoeTaigi 計畫：台文華文線頂辭典（鄭良偉、楊允言教授與志工，CC BY-SA 4.0）及 iTaigi 華台對照典（CC0）。</string>
+</resources>

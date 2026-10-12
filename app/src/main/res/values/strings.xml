@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">Phah Taibun</string>
+    <string name="ime_name">Phah Taibun 拍台文</string>
+    <string name="subtype_taigi">Taigi (POJ / Tâi-lô)</string>
+
+    <string name="keyboard_loading">Loading dictionary…</string>
+    <string name="keyboard_toggle_hint">Tap or swipe ↕ to switch 漢字 / romanization</string>
+
+    <string name="settings_intro">A Taigi keyboard that understands both POJ (Pe̍h-ōe-jī) and Tâi-lô. Type without tone marks — they are filled in for you — and switch between Hàn-lô and romanization at any time.</string>
+    <string name="settings_setup">Setup</string>
+    <string name="settings_enable">1. Enable Phah Taibun</string>
+    <string name="settings_select">2. Switch to Phah Taibun</string>
+    <string name="settings_done">Done</string>
+    <string name="settings_roman_system">Romanization</string>
+    <string name="settings_roman_system_desc">Spelling used for romanized output and for romanized parts of Hàn-lô.</string>
+    <string name="settings_poj">POJ (白話字)</string>
+    <string name="settings_tailo">Tâi-lô (台羅)</string>
+    <string name="settings_output_mode">Default output</string>
+    <string name="settings_output_mode_desc">Also switchable on the keyboard by tapping the input buffer or swiping the candidate bar up/down.</string>
+    <string name="settings_hanlo">Hàn-lô (漢字)</string>
+    <string name="settings_roman">Romanization</string>
+    <string name="settings_fuzzy">Fuzzy matching</string>
+    <string name="settings_fuzzy_desc">Accept spellings that merge these distinctions. Exact matches are still ranked first.</string>
+    <string name="fuzzy_o_oo">o ⇄ o͘ / oo</string>
+    <string name="fuzzy_nasal">Optional nasalization (a ⇄ aⁿ)</string>
+    <string name="fuzzy_glottal_stop">Optional final h (a ⇄ ah)</string>
+    <string name="fuzzy_aspiration">Ignore aspiration (p/ph, t/th, k/kh, ch/chh)</string>
+    <string name="fuzzy_ue_e">Accent: ue ⇄ e (kue / ke)</string>
+    <string name="fuzzy_i_u">Accent: i ⇄ u (gí / gú)</string>
+    <string name="fuzzy_inn_enn">Accent: iⁿ ⇄ eⁿ (chhiⁿ / chheⁿ)</string>
+    <string name="fuzzy_j_l">Accent: j ⇄ l (ji̍t / li̍t)</string>
+    <string name="settings_try">Try it</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_text">Licensed under the GNU General Public License v3.0 or later.\n\nDictionary data from the ChhoeTaigi project: 台文華文線頂辭典 (Tēⁿ Liông-úi, Iûⁿ Ún-giân and volunteers, CC BY-SA 4.0) and iTaigi 華台對照典 (CC0).</string>
+</resources>

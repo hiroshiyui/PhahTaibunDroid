@@ -1,0 +1,96 @@
+Phah Taibun (拍台文)
+Copyright (C) 2026.  YOU, Hui-Hong <hiroshi@miyabi-hiroshi.com>
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See the LICENSE file for the full license text.
+
+This product includes or depends on the third-party components listed below,
+each under its own copyright and license.
+
+
+===============================================================================
+Dictionary data
+===============================================================================
+
+The lexicon shipped in this product (app/src/main/assets/lexicon.tsv) is
+compiled from datasets published by the ChhoeTaigi project
+(ChhoeTaigi 找台語：台語字詞資料庫, part of 台文雞絲麵 Tâibûn Kesimī):
+  https://github.com/ChhoeTaigi/ChhoeTaigiDatabase
+  https://chhoe.taigi.info/
+
+The lexicon is a MODIFIED version of these datasets: romanizations were
+re-parsed and normalized to numeric-tone Tâi-lô, Hàn-lô forms were cleaned of
+annotations, entries without usable romanization or Hàn-lô were dropped, and
+the datasets were merged and de-duplicated with derived ranking weights, by
+tools/dictbuilder in this repository.
+
+-------------------------------------------------------------------------------
+台文華文線頂辭典 (Taihoa Soanntēng Tuìchiàutián)
+-------------------------------------------------------------------------------
+  基礎資料提供：Tēⁿ Liông-úi（鄭良偉）教授
+  資料增加kap編修：Iûⁿ Ún-giân（楊允言）教授、眾phah字kap校對ê義工
+  Base data: Prof. Tēⁿ Liông-úi (鄭良偉)
+  Additions and editing: Prof. Iûⁿ Ún-giân (楊允言) and volunteer typists
+  and proofreaders
+  Original site: http://ip194097.ntcu.edu.tw/ungian/soannteng/chil/Taihoa.asp
+  ChhoeTaigi dataset: ChhoeTaigi_TaihoaSoanntengTuichiautian
+
+  License: Creative Commons Attribution-ShareAlike 4.0 International
+  (CC BY-SA 4.0)
+  https://creativecommons.org/licenses/by-sa/4.0/
+
+  The modified dataset in this product is likewise made available under
+  CC BY-SA 4.0. (CC BY-SA 4.0 is declared one-way compatible with GPLv3 by
+  Creative Commons.)
+
+-------------------------------------------------------------------------------
+iTaigi 華台對照典 (iTaigi Hoâ-Tâi Tuìchiàutián)
+-------------------------------------------------------------------------------
+  Data provided by the iTaigi team and its contributors.
+  Original site: https://itaigi.tw/
+  ChhoeTaigi dataset: ChhoeTaigi_iTaigiHoataiTuichiautian
+
+  License: CC0 1.0 Universal (Public Domain Dedication)
+  https://creativecommons.org/publicdomain/zero/1.0/
+
+
+===============================================================================
+Libraries bundled in the application
+===============================================================================
+
+Android Jetpack (AndroidX): Core, Activity, Lifecycle, Compose (Runtime, UI,
+Foundation, Material 3)
+  Copyright The Android Open Source Project
+  License: Apache License, Version 2.0
+  https://developer.android.com/jetpack/androidx
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Kotlin Standard Library, kotlinx.coroutines
+  Copyright JetBrains s.r.o. and Kotlin Programming Language contributors
+  License: Apache License, Version 2.0
+  https://github.com/JetBrains/kotlin
+  https://github.com/Kotlin/kotlinx.coroutines
+  https://www.apache.org/licenses/LICENSE-2.0
+
+
+===============================================================================
+Build and test tooling (not included in the application)
+===============================================================================
+
+Gradle Wrapper (gradlew, gradlew.bat, gradle/wrapper/gradle-wrapper.jar)
+  Copyright Gradle Inc.
+  License: Apache License, Version 2.0
+  https://gradle.org/
+
+JUnit 4
+  Copyright JUnit contributors
+  License: Eclipse Public License 1.0
+  https://junit.org/junit4/
+  https://www.eclipse.org/legal/epl-v10.html
+
+AndroidX Test (JUnit extensions, Espresso)
+  Copyright The Android Open Source Project
+  License: Apache License, Version 2.0
+  https://developer.android.com/training/testing
