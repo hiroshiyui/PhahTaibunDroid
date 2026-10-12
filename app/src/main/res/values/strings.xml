@@ -6,6 +6,20 @@
     <string name="keyboard_loading">Loading dictionary…</string>
     <string name="keyboard_toggle_hint">Tap or swipe ↕ to switch 漢字 / romanization</string>
 
+    <!-- Spoken by screen readers for keys drawn as symbols. -->
+    <string name="key_shift">Shift</string>
+    <string name="key_delete">Delete</string>
+    <string name="key_switch_ime">Switch input method</string>
+    <string name="key_space">Space</string>
+    <string name="key_layer_symbols">Symbols</string>
+    <string name="key_layer_letters">Letters</string>
+    <string name="key_enter">Enter</string>
+    <string name="key_go">Go</string>
+    <string name="key_search">Search</string>
+    <string name="key_send">Send</string>
+    <string name="key_next">Next</string>
+    <string name="key_done">Done</string>
+
     <string name="settings_intro">A Taigi keyboard that understands both POJ (Pe̍h-ōe-jī) and Tâi-lô. Type without tone marks — they are filled in for you — and switch between Hàn-lô and romanization at any time.</string>
     <string name="settings_setup">Setup</string>
     <string name="settings_enable">1. Enable Phah Taibun Droid</string>

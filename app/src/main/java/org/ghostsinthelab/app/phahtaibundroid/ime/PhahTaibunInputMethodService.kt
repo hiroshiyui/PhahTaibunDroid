@@ -1,10 +1,12 @@
 package org.ghostsinthelab.app.phahtaibundroid.ime
 
 import android.inputmethodservice.InputMethodService
+import android.os.Build
 import android.text.InputType
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -95,8 +97,8 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         state.directInput = isDirectInput(info)
         learning = info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING == 0
-        state.enterLabel = enterLabel(info)
-        state.offerSwitchKey = shouldOfferSwitchingToNextInputMethod()
+        state.enterAction = info.imeOptions and EditorInfo.IME_MASK_ACTION
+        state.offerSwitchKey = offerSwitchingToNextInputMethod()
         state.layer = if (isNumericField(info)) KeyboardLayer.SYMBOLS else KeyboardLayer.LETTERS
         state.shifted = false
         state.mode = prefs.outputMode
@@ -196,7 +198,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
                 prefs.outputMode = state.mode
                 this.composer?.mode = state.mode
             }
-            KeyAction.SwitchInputMethod -> switchToNextInputMethod(false)
+            KeyAction.SwitchInputMethod -> switchToNextInput()
         }
         render()
     }
@@ -267,14 +269,26 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         }
     }
 
-    private fun enterLabel(info: EditorInfo): String = when (info.imeOptions and EditorInfo.IME_MASK_ACTION) {
-        EditorInfo.IME_ACTION_GO -> "→"
-        EditorInfo.IME_ACTION_SEARCH -> "🔍"
-        EditorInfo.IME_ACTION_SEND -> "➤"
-        EditorInfo.IME_ACTION_NEXT -> "⇥"
-        EditorInfo.IME_ACTION_DONE -> "✓"
-        else -> "⏎"
+    // The InputMethodService versions of these exist from API 28; older releases only have the
+    // (since deprecated) InputMethodManager calls taking the IME window token.
+    private fun offerSwitchingToNextInputMethod(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) return shouldOfferSwitchingToNextInputMethod()
+        val token = windowToken ?: return false
+        @Suppress("DEPRECATION")
+        return inputMethodManager.shouldOfferSwitchingToNextInputMethod(token)
     }
+
+    private fun switchToNextInput() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            switchToNextInputMethod(false)
+        } else {
+            @Suppress("DEPRECATION")
+            inputMethodManager.switchToNextInputMethod(windowToken ?: return, false)
+        }
+    }
+
+    private val inputMethodManager get() = getSystemService(InputMethodManager::class.java)
+    private val windowToken get() = window?.window?.attributes?.token
 
     private companion object {
         /** Punctuation typed while writing Hàn-lô uses full-width forms. */

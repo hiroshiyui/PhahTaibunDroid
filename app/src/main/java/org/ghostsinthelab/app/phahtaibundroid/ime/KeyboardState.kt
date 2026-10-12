@@ -1,6 +1,8 @@
 package org.ghostsinthelab.app.phahtaibundroid.ime
 
+import android.view.inputmethod.EditorInfo
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.Composer
@@ -21,7 +23,9 @@ class KeyboardState {
 
     /** Composition disabled: passwords, URLs, numbers and similar fields. */
     var directInput by mutableStateOf(false)
-    var enterLabel by mutableStateOf("⏎")
+
+    /** The editor's action (`EditorInfo.IME_ACTION_*`), shown on the enter key. */
+    var enterAction by mutableIntStateOf(EditorInfo.IME_ACTION_UNSPECIFIED)
 
     /** Switching to another input method makes sense (more than one is enabled). */
     var offerSwitchKey by mutableStateOf(false)

@@ -1,8 +1,23 @@
 <resources>
+    <string name="app_name">拍台文</string>
+    <string name="ime_name">拍台文 Phah Taibun Droid</string>
     <string name="subtype_taigi">台語（白話字／台羅）</string>
 
     <string name="keyboard_loading">辭典載入中…</string>
     <string name="keyboard_toggle_hint">點選或上下滑動 ↕ 以切換漢字／羅馬字</string>
+
+    <string name="key_shift">大寫</string>
+    <string name="key_delete">刪除</string>
+    <string name="key_switch_ime">切換輸入法</string>
+    <string name="key_space">空白鍵</string>
+    <string name="key_layer_symbols">符號</string>
+    <string name="key_layer_letters">字母</string>
+    <string name="key_enter">換行</string>
+    <string name="key_go">前往</string>
+    <string name="key_search">搜尋</string>
+    <string name="key_send">傳送</string>
+    <string name="key_next">下一個</string>
+    <string name="key_done">完成</string>
 
     <string name="settings_intro">同時支援白話字（POJ）與台羅的台語鍵盤。不必輸入聲調符號，系統會自動補上；隨時可在漢羅與羅馬字之間切換。</string>
     <string name="settings_setup">設定</string>
@@ -29,5 +44,5 @@
     <string name="fuzzy_j_l">腔調：j ⇄ l（ji̍t／li̍t）</string>
     <string name="settings_try">試用</string>
     <string name="settings_about">關於</string>
-    <string name="settings_about_text">本軟體以 GNU 通用公共授權條款第 3 版或任何後續版本（GPL-3.0-or-later）授權。\n\n辭典資料來自 ChhoeTaigi 計畫：台文華文線頂辭典（鄭良偉、楊允言教授與志工，CC BY-SA 4.0）及 iTaigi 華台對照典（CC0）。</string>
+    <string name="settings_about_text">本軟體以 GNU 通用公共授權條款第 3 版或任何後續版本（GPL-3.0-or-later）授權。\n\n辭典資料來自 ChhoeTaigi 計畫：台文華文線頂辭典（鄭良偉、楊允言與志工，CC BY-SA 4.0）及 iTaigi 華台對照典（CC0）。</string>
 </resources>
