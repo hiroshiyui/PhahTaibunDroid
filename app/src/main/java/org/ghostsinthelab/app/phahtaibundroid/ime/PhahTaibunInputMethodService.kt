@@ -15,7 +15,9 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
@@ -54,6 +56,8 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             if (learning) history.record(hanlo, numeric)
         }
     }
+
+    private val historySaveScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** `null` until the lexicon has loaded. */
     private var composer: Composer? = null
@@ -113,7 +117,10 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         composingShown = false
         render()
         saveHistory()
-        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        // Also reached from super.onDestroy(); only pause a lifecycle that is actually resumed.
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        }
         super.onFinishInputView(finishingInput)
     }
 
@@ -137,9 +144,10 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
     }
 
     override fun onDestroy() {
+        // super.onDestroy() finishes the input view, which needs a not-yet-destroyed lifecycle.
+        super.onDestroy()
         saveHistory()
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        super.onDestroy()
     }
 
     private suspend fun loadEngine() {
@@ -229,11 +237,14 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
 
     private fun saveHistory() {
         if (!history.dirty) return
-        lifecycleScope.launch(Dispatchers.IO) {
-            runCatching {
-                val tmp = File(historyFile.path + ".tmp")
-                tmp.writer().use(history::save)
-                tmp.renameTo(historyFile)
+        // Not lifecycleScope: a save started during onDestroy must not be cancelled with it.
+        historySaveScope.launch {
+            synchronized(historyFile) {
+                runCatching {
+                    val tmp = File(historyFile.path + ".tmp")
+                    tmp.writer().use(history::save)
+                    tmp.renameTo(historyFile)
+                }
             }
         }
     }
