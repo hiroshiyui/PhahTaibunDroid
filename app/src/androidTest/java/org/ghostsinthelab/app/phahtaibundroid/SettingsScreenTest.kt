@@ -1,6 +1,7 @@
 package org.ghostsinthelab.app.phahtaibundroid
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertIsSelected
@@ -46,7 +47,8 @@ class SettingsScreenTest {
     fun togglingFuzzyRulePersists() {
         val rule = FuzzyRule.ASPIRATION
         val wasOn = rule in prefs.fuzzyRules
-        val row = compose.onNode(hasText(string(R.string.fuzzy_aspiration)) and isToggleable()).performScrollTo()
+        val label = if (prefs.romanSystem == RomanSystem.POJ) R.string.fuzzy_aspiration_poj else R.string.fuzzy_aspiration_tailo
+        val row = compose.onNode(hasText(string(label)) and isToggleable()).performScrollTo()
         if (wasOn) row.assertIsOn() else row.assertIsOff()
 
         row.performClick()
@@ -55,6 +57,16 @@ class SettingsScreenTest {
 
         row.performClick()
         assertEquals(wasOn, rule in prefs.fuzzyRules)
+    }
+
+    @Test
+    fun fuzzyLabelsFollowTheChosenSystem() {
+        choice(R.string.settings_poj).performScrollTo().performClick()
+        compose.onNode(hasText(string(R.string.fuzzy_aspiration_poj)) and isToggleable()).performScrollTo()
+        compose.onAllNodes(hasText(string(R.string.fuzzy_aspiration_tailo))).assertCountEquals(0)
+        choice(R.string.settings_tailo).performScrollTo().performClick()
+        compose.onNode(hasText(string(R.string.fuzzy_ue_e_tailo)) and isToggleable()).performScrollTo()
+        compose.onAllNodes(hasText(string(R.string.fuzzy_ue_e_poj))).assertCountEquals(0)
     }
 
     @Test

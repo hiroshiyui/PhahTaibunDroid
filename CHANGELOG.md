@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Fuzzy-matching labels in settings spell their examples in the chosen romanization system (POJ `ch/chh`, `aⁿ`, `koe`; Tâi-lô `ts/tsh`, `ann`, `kue`) instead of mixing both. While the index is rebuilt after a fuzzy-rule change, the keyboard shows its loading state.
 - POJ output writes the vowels Tâi-lô spells `ir`/`er`/`ere` as `ṳ`/`o̤`/`o̤e` (e.g. sṳ́, ko̤e), as iTaigi's POJ does, instead of borrowing the Tâi-lô spelling; ASCII `ur`/`or`/`ore` are accepted as input. The lexicon was regenerated: 5 accent variants spelled with `or` in iTaigi are now included.
 - The dictionary loads about twice as fast and with a fraction of the temporary memory (Nokia G50 release build: 713 → 336 ms; Java heap while loading 73 → 25 MB, once loaded 26 → 21 MB).
 - In romanization mode, pieces selected one by one are joined by what was typed between them (`-` when typed as one run), not always by spaces.

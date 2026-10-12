@@ -16,6 +16,7 @@ import org.ghostsinthelab.app.phahtaibundroid.MainActivity
 import org.ghostsinthelab.app.phahtaibundroid.R
 import org.ghostsinthelab.app.phahtaibundroid.SettingsSnapshot
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
+import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 import org.ghostsinthelab.app.phahtaibundroid.settings.ImePreferences
 import org.junit.After
@@ -56,6 +57,8 @@ class PhahTaibunInputMethodServiceTest {
         // Read by the service when the field gets focus.
         prefs.outputMode = OutputMode.HANLO
         prefs.romanSystem = RomanSystem.TAILO
+        // Rankings below assume the default fuzzy rules, whatever the device was left with.
+        prefs.fuzzyRules = FuzzyRule.DEFAULTS
         showKeyboard()
         // The hint replaces the loading message once the lexicon is ready.
         assertTrue(

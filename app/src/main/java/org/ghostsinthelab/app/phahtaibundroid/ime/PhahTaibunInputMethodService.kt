@@ -124,7 +124,11 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
         state.mode = prefs.outputMode
         state.system = prefs.romanSystem
         // Settings may have changed while we were hidden.
-        composer?.takeIf { it.engine.lexicon.rules != prefs.fuzzyRules }?.let { lifecycleScope.launch { loadEngine() } }
+        composer?.takeIf { it.engine.lexicon.rules != prefs.fuzzyRules }?.let {
+            // Fuzzy rules changed: show the loading state until the index is rebuilt for them.
+            state.ready = false
+            lifecycleScope.launch { loadEngine() }
+        }
         composer?.let {
             it.mode = state.mode
             it.system = state.system

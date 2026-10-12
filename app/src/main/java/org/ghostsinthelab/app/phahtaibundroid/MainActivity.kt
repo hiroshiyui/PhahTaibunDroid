@@ -75,19 +75,23 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Fuzzy-rule labels as (POJ, Tâi-lô) pairs: examples are spelled in the user's chosen system, as
+ * POJ and Tâi-lô users each expect their own spelling.
+ */
 private val FUZZY_LABELS = mapOf(
-    FuzzyRule.O_OO to R.string.fuzzy_o_oo,
-    FuzzyRule.NASAL to R.string.fuzzy_nasal,
-    FuzzyRule.GLOTTAL_STOP to R.string.fuzzy_glottal_stop,
-    FuzzyRule.ENTERING_TONE to R.string.fuzzy_entering_tone,
-    FuzzyRule.CODA_M_N to R.string.fuzzy_coda_m_n,
-    FuzzyRule.CODA_N_NG to R.string.fuzzy_coda_n_ng,
-    FuzzyRule.ASPIRATION to R.string.fuzzy_aspiration,
-    FuzzyRule.VOICING to R.string.fuzzy_voicing,
-    FuzzyRule.UE_E to R.string.fuzzy_ue_e,
-    FuzzyRule.I_U to R.string.fuzzy_i_u,
-    FuzzyRule.INN_ENN to R.string.fuzzy_inn_enn,
-    FuzzyRule.J_L to R.string.fuzzy_j_l,
+    FuzzyRule.O_OO to (R.string.fuzzy_o_oo_poj to R.string.fuzzy_o_oo_tailo),
+    FuzzyRule.NASAL to (R.string.fuzzy_nasal_poj to R.string.fuzzy_nasal_tailo),
+    FuzzyRule.GLOTTAL_STOP to (R.string.fuzzy_glottal_stop to R.string.fuzzy_glottal_stop),
+    FuzzyRule.ENTERING_TONE to (R.string.fuzzy_entering_tone to R.string.fuzzy_entering_tone),
+    FuzzyRule.CODA_M_N to (R.string.fuzzy_coda_m_n to R.string.fuzzy_coda_m_n),
+    FuzzyRule.CODA_N_NG to (R.string.fuzzy_coda_n_ng to R.string.fuzzy_coda_n_ng),
+    FuzzyRule.ASPIRATION to (R.string.fuzzy_aspiration_poj to R.string.fuzzy_aspiration_tailo),
+    FuzzyRule.VOICING to (R.string.fuzzy_voicing to R.string.fuzzy_voicing),
+    FuzzyRule.UE_E to (R.string.fuzzy_ue_e_poj to R.string.fuzzy_ue_e_tailo),
+    FuzzyRule.I_U to (R.string.fuzzy_i_u to R.string.fuzzy_i_u),
+    FuzzyRule.INN_ENN to (R.string.fuzzy_inn_enn_poj to R.string.fuzzy_inn_enn_tailo),
+    FuzzyRule.J_L to (R.string.fuzzy_j_l to R.string.fuzzy_j_l),
 )
 
 @Composable
@@ -145,7 +149,8 @@ private fun SettingsScreen(prefs: ImePreferences) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Checkbox(checked = checked, onCheckedChange = null)
-                    Text(stringResource(FUZZY_LABELS.getValue(rule)), Modifier.padding(start = 12.dp))
+                    val (poj, tailo) = FUZZY_LABELS.getValue(rule)
+                    Text(stringResource(if (system == RomanSystem.POJ) poj else tailo), Modifier.padding(start = 12.dp))
                 }
             }
 
