@@ -21,9 +21,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Per-app language, independently of the device language: English, Traditional Chinese or Taigi in the app's own settings on every supported Android version; on Android 13+ English and Traditional Chinese can also be chosen in the system's App info → Language.
 - Taigi UI in Hàn-lô (`nan-Hant-TW`). Android's settings don't list `nan`, so it is chosen in the app; the keyboard follows a language change without restarting.
 - GPL-3.0-or-later license, third-party `NOTICE`, and bilingual `README.md`.
+- Abbreviated input with one letter per syllable (`tg` → 台語, `kms` → 感謝), ranked below fully spelled words.
+- `?` wildcard for unsure letters or a whole syllable (`s?ah`, `tai-?`).
+- Whole-input phrase candidates for long unseparated input (`tsuekinthinnkhitsinho` → 最近天氣真好), and words that often follow the previously selected one rank higher (word-pair data support; none bundled yet).
+- Neutral-tone forms: a typed `--` favours neutral-tone entries and offers common suffixes (`tsiahpa--ah` → 食飽矣).
 - F-Droid metadata (English and Traditional Chinese), privacy policy, and GitHub Actions CI running unit tests, lint and a debug build.
 
 ### Changed
 
+- In romanization mode, pieces selected one by one are joined by what was typed between them (`-` when typed as one run), not always by spaces.
+- Romanization: Tâi-lô `ere` takes its tone mark on the second e (`erê`), `o͘ⁿ` is read as `oⁿ`, and POJ `ṳ`/`o̤` are accepted (found by cross-checking with KeSi).
 - Cloud backup is disabled: settings and word history are no longer included in Google Drive backups (device-to-device transfer still works).
 - Project renamed to Phah Taibun Droid to avoid a naming conflict with [rime-phah-taibun](https://github.com/soanseng/rime-phah-taibun). The application ID is now `org.ghostsinthelab.app.phahtaibundroid`; test installs under the old ID must be uninstalled separately.
