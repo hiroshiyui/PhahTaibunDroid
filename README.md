@@ -4,6 +4,15 @@
 
 # Phah Taibun Droid 拍台文
 
+<p>
+  <img src="./media/keyboard-hanlo.png" width="45%" alt="Typing taigi in Hàn-lô mode: candidates 台語, 帶疑, 臺語… 以漢羅模式輸入 taigi：候選詞 台語、帶疑、臺語…">
+  <img src="./media/keyboard-tailo.png" width="45%" alt="The same input in Tâi-lô mode: candidates Tâi-gí, tài-gî… 同一輸入切換為台羅模式：候選詞 Tâi-gí、tài-gî…">
+</p>
+
+*Typing `taigi`: Hàn-lô output (left) and Tâi-lô output (right), switched by tapping the input buffer or swiping the candidate bar.*
+
+*輸入 `taigi`：左為漢羅輸出，右為台羅輸出；點選輸入區或上下滑動候選字列即可切換。*
+
 ## About 這是啥
 
 An Android software keyboard (input method editor) for [Taigi](https://en.wikipedia.org/wiki/Taiwanese_Hokkien) (台語, Taiwanese Hokkien). Type in either [POJ (Pe̍h-ōe-jī, 白話字)](https://en.wikipedia.org/wiki/Pe%CC%8Dh-%C5%8De-j%C4%AB) or [Tâi-lô (台羅)](https://en.wikipedia.org/wiki/Taiwanese_Romanization_System) — or a mix of both — and get Hàn-lô (漢羅, Han characters mixed with romanization) or properly tone-marked romanization.
