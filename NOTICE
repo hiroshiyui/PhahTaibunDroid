@@ -57,6 +57,31 @@ iTaigi 華台對照典 (iTaigi Hoâ-Tâi Tuìchiàutián)
 
 
 ===============================================================================
+Fonts (glyph outlines used in the launcher icon)
+===============================================================================
+
+No font files are bundled in the application. The launcher icon
+(app/src/main/res/drawable/ic_launcher_foreground.xml,
+ic_launcher_monochrome.xml, and the mipmap-*/ic_launcher*.webp renderings)
+contains vector paths converted from the outlines of the glyphs 台, T, â and i
+of the fonts below.
+
+Noto Sans TC (Bold, version 2.004; Noto Sans CJK) -- glyph 台
+  © 2014-2021 Adobe (http://www.adobe.com/).
+  Noto is a trademark of Google Inc.
+  License: SIL Open Font License, Version 1.1
+  https://github.com/notofonts/noto-cjk
+  https://openfontlicense.org/
+
+Noto Sans (Bold, version 2.015) -- glyphs T, â, i
+  Copyright 2022 The Noto Project Authors
+  (https://github.com/notofonts/latin-greek-cyrillic)
+  License: SIL Open Font License, Version 1.1
+  https://github.com/notofonts/latin-greek-cyrillic
+  https://openfontlicense.org/
+
+
+===============================================================================
 Libraries bundled in the application
 ===============================================================================
 
