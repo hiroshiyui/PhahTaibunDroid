@@ -19,15 +19,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The Gradle daemon requires JDK 25 (gradle/gradle-daemon-jvm.properties).
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 25
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Unit tests
         run: ./gradlew :core:test :app:testDebugUnitTest
@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload test and lint reports
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reports
           path: |
@@ -48,7 +48,7 @@ jobs:
             app/build/reports/
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: debug-apk
           path: app/build/outputs/apk/debug/*.apk
