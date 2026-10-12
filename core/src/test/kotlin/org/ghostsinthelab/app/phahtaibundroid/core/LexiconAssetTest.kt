@@ -2,6 +2,7 @@ package org.ghostsinthelab.app.phahtaibundroid.core
 
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Lexicon
+import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.BeforeClass
@@ -41,6 +42,22 @@ class LexiconAssetTest {
         assertTopContains("kamsia", "感謝")
         assertTopContains("sinsenn", "先生")
         assertTopContains("sinsi", "先生") // nasal omitted
+    }
+
+    @Test
+    fun pinyinHabits() {
+        val loose = CandidateEngine(engine.lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.ENTERING_TONE + FuzzyRule.VOICING))
+        val top = loose.candidates("dageho").take(3).map { it.hanlo ?: it.tailo }
+        assertTrue("dageho → $top", "逐家好" in top)
+        assertTopContains("dakkeho", "逐家好")
+    }
+
+    @Test
+    fun nasalCodaMergers() {
+        val mn = CandidateEngine(engine.lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.CODA_M_N))
+        assertTrue("kansia", "感謝" in mn.candidates("kansia").take(3).map { it.hanlo })
+        val nng = CandidateEngine(engine.lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.CODA_N_NG))
+        assertTrue("singbun", "新聞" in nng.candidates("singbun").take(5).map { it.hanlo })
     }
 
     @Test

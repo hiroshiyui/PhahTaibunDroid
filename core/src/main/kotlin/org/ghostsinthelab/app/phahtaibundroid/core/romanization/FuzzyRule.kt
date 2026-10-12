@@ -18,8 +18,26 @@ enum class FuzzyRule(val defaultEnabled: Boolean) {
     /** Final glottal stop optional: `a` ⇄ `ah`. */
     GLOTTAL_STOP(false),
 
+    /**
+     * Entering-tone (入聲) codas optional or mixed up: `ta` ⇄ `tap` ⇄ `tat` ⇄ `tak` ⇄ `tah`. Short
+     * stops are easy to miss or mishear (`dageho` for `ta̍k-ke-hó`). Includes [GLOTTAL_STOP].
+     */
+    ENTERING_TONE(false),
+
+    /** Nasal codas `-m` ⇄ `-n` (`kam` ⇄ `kan`). Syllabic `m` (`m̄`, `hm`) is unaffected. */
+    CODA_M_N(false),
+
+    /** Nasal codas `-n` ⇄ `-ng` (`sin` ⇄ `sing`), a common merger in Taiwan Mandarin. */
+    CODA_N_NG(false),
+
     /** Aspiration ignored: `p`/`ph`, `t`/`th`, `k`/`kh`, `ts`/`tsh`. */
     ASPIRATION(false),
+
+    /**
+     * Voiced and plain initials merged: `b`/`p`, `g`/`k`. Mandarin pinyin writes Taigi's plain
+     * `p` and `k` as `b` and `g`.
+     */
+    VOICING(false),
 
     /** Dialectal `ue` ⇄ `e` (kue/ke 過). */
     UE_E(false),
@@ -39,7 +57,15 @@ enum class FuzzyRule(val defaultEnabled: Boolean) {
         O_OO -> base.replace("oo", "o")
         NASAL -> base.replace(NASAL_NN, "")
         GLOTTAL_STOP -> if (base.length > 1 && base.endsWith('h')) base.dropLast(1) else base
+        ENTERING_TONE -> if (base.length > 1 && base.last() in "ptkh") base.dropLast(1) else base
+        CODA_M_N -> base.replace(CODA_M, "n")
+        CODA_N_NG -> base.replace(CODA_NG, "n")
         ASPIRATION -> ASPIRATED.find(base)?.let { base.removeRange(it.range.last, it.range.last + 1) } ?: base
+        VOICING -> when (base.firstOrNull()) {
+            'b' -> "p" + base.substring(1)
+            'g' -> "k" + base.substring(1)
+            else -> base
+        }
         UE_E -> base.replace("ue", "e")
         I_U -> I_U_RIME.matchEntire(base)?.let { it.groupValues[1] + "i" } ?: base
         INN_ENN -> base.replace("inn", "enn")
@@ -50,6 +76,8 @@ enum class FuzzyRule(val defaultEnabled: Boolean) {
         val DEFAULTS: Set<FuzzyRule> = entries.filter { it.defaultEnabled }.toSet()
 
         private val NASAL_NN = Regex("(?<=[aeiou])nn")
+        private val CODA_M = Regex("(?<=[aeiou])m$")
+        private val CODA_NG = Regex("(?<=[aeiou])ng$")
         private val ASPIRATED = Regex("^(?:ph|th|kh|tsh)")
         private val I_U_RIME = Regex("^(tsh|ts|ph|th|kh|ng|[pmbtnlkghsj]?)(?:ir|u)$")
 

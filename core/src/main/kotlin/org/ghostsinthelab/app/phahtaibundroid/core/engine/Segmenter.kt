@@ -137,7 +137,7 @@ class Segmenter(private val lexicon: Lexicon) {
 
     /** Returns how [s] can be used as a syllable, or `null` if it cannot. */
     private fun classify(s: String, partialAllowed: Boolean): InputSyllable.Kind? {
-        val parsed = Romanization.parseSyllable(s)
+        val parsed = parseTyped(s)
         if (parsed != null && lexicon.isSyllable(lexicon.loosen(parsed.base))) return InputSyllable.Kind.COMPLETE
         if (partialAllowed && partialVariants(s).any { lexicon.hasSyllablePrefix(lexicon.loosen(it)) }) {
             return InputSyllable.Kind.PARTIAL
@@ -148,7 +148,7 @@ class Segmenter(private val lexicon: Lexicon) {
     private fun piece(run: Run, i: Int, j: Int, kind: InputSyllable.Kind): InputSyllable {
         val raw = run.text.substring(i, j)
         val isLast = j == run.text.length
-        val parsed = Romanization.parseSyllable(raw)
+        val parsed = parseTyped(raw)
         val base = when (kind) {
             InputSyllable.Kind.COMPLETE -> parsed!!.base
             InputSyllable.Kind.PARTIAL -> partialVariants(raw.lowercase())
@@ -169,6 +169,9 @@ class Segmenter(private val lexicon: Lexicon) {
 
     companion object {
         const val MAX_SEGMENTATIONS = 16
+
+        /** Parses a typed syllable, accepting Mandarin-pinyin initials such as `d` for `t`. */
+        private fun parseTyped(s: String) = Romanization.parseSyllable(Romanization.respellPinyinInitial(s))
 
         private const val VOWELS = "aeiou"
 
@@ -191,7 +194,8 @@ class Segmenter(private val lexicon: Lexicon) {
          * the Tâi-lô forms of such endings too.
          */
         internal fun partialVariants(s: String): List<String> {
-            val p = if (s == "c") "ts" else Romanization.canonicalBase(s)
+            // A lone `c` may still become POJ `ch`/`chh` (ts/tsh) rather than pinyin `c` (tsh).
+            val p = if (s == "c") "ts" else Romanization.canonicalBase(Romanization.respellPinyinInitial(s))
             val variants = mutableListOf(p)
             when {
                 p.endsWith("en") -> variants += p.dropLast(2) + "in" // eng → ing

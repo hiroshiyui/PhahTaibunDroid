@@ -38,6 +38,10 @@
     <string name="fuzzy_o_oo">o ⇄ o͘ / oo</string>
     <string name="fuzzy_nasal">Optional nasalization (a ⇄ aⁿ)</string>
     <string name="fuzzy_glottal_stop">Optional final h (a ⇄ ah)</string>
+    <string name="fuzzy_entering_tone">Entering tones: final p/t/k/h optional or mixed (ta ⇄ ta̍k ⇄ ta̍t)</string>
+    <string name="fuzzy_voicing">Pinyin-style b/g for p/k (ba ⇄ pa, ge ⇄ ke)</string>
+    <string name="fuzzy_coda_m_n">Final m ⇄ n (kam ⇄ kan)</string>
+    <string name="fuzzy_coda_n_ng">Final n ⇄ ng (sin ⇄ sing)</string>
     <string name="fuzzy_aspiration">Ignore aspiration (p/ph, t/th, k/kh, ch/chh)</string>
     <string name="fuzzy_ue_e">Accent: ue ⇄ e (kue / ke)</string>
     <string name="fuzzy_i_u">Accent: i ⇄ u (gí / gú)</string>

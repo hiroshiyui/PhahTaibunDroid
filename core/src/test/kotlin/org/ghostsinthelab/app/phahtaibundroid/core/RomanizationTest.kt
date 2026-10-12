@@ -100,6 +100,32 @@ class RomanizationTest {
         assertEquals("gi", FuzzyRule.loosen("gu", setOf(FuzzyRule.I_U)))
         assertEquals("gin", FuzzyRule.loosen("gin", setOf(FuzzyRule.I_U)))
         assertEquals("lit", FuzzyRule.loosen("jit", setOf(FuzzyRule.J_L)))
+        assertEquals("ta", FuzzyRule.loosen("tak", setOf(FuzzyRule.ENTERING_TONE)))
+        assertEquals("ta", FuzzyRule.loosen("tat", setOf(FuzzyRule.ENTERING_TONE)))
+        assertEquals("hia", FuzzyRule.loosen("hiannh", setOf(FuzzyRule.NASAL, FuzzyRule.ENTERING_TONE)))
+        assertEquals("m", FuzzyRule.loosen("m", setOf(FuzzyRule.ENTERING_TONE)))
+        assertEquals("kan", FuzzyRule.loosen("kam", setOf(FuzzyRule.CODA_M_N)))
+        assertEquals("hm", FuzzyRule.loosen("hm", setOf(FuzzyRule.CODA_M_N)))
+        assertEquals("sin", FuzzyRule.loosen("sing", setOf(FuzzyRule.CODA_N_NG)))
+        assertEquals("ng", FuzzyRule.loosen("ng", setOf(FuzzyRule.CODA_N_NG)))
+        assertEquals("kam", FuzzyRule.loosen("kam", setOf(FuzzyRule.CODA_N_NG)))
+        assertEquals("ki", FuzzyRule.loosen("gi", setOf(FuzzyRule.VOICING)))
+        assertEquals("pah", FuzzyRule.loosen("bah", setOf(FuzzyRule.VOICING)))
+        assertEquals("ngo", FuzzyRule.loosen("ngo", setOf(FuzzyRule.VOICING)))
+    }
+
+    @Test
+    fun respellsPinyinInitials() {
+        assertEquals("tage", Romanization.respellPinyinInitial("dage"))
+        assertEquals("Tai", Romanization.respellPinyinInitial("Dai"))
+        assertEquals("tsui", Romanization.respellPinyinInitial("zui"))
+        assertEquals("tsua", Romanization.respellPinyinInitial("zhua"))
+        assertEquals("tshit", Romanization.respellPinyinInitial("cit"))
+        assertEquals("tshiu", Romanization.respellPinyinInitial("qiu"))
+        assertEquals("sio", Romanization.respellPinyinInitial("xio"))
+        // POJ ch/chh and real Taigi initials are untouched.
+        assertEquals("chhit", Romanization.respellPinyinInitial("chhit"))
+        assertEquals("gi", Romanization.respellPinyinInitial("gi"))
     }
 
     private fun render(numeric: String, system: org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem) =

@@ -28,6 +28,8 @@ class EngineTest {
         LexiconEntry("講", null, "kong2", 9),
         LexiconEntry("講話", null, "kong2-ue7", 6),
         LexiconEntry("閣", null, "koh4", 6),
+        LexiconEntry("逐家好", null, "tak8-ke1-ho2", 5),
+        LexiconEntry("罩", null, "ta3", 3),
     )
     private val lexicon = Lexicon(entries)
     private val engine = CandidateEngine(lexicon)
@@ -74,6 +76,24 @@ class EngineTest {
         assertNull(engine.candidates("gu").firstOrNull { it.hanlo == "語" && it.numeric == "gi2" })
         val dialect = CandidateEngine(lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.I_U))
         assertTrue(dialect.candidates("gu").any { it.numeric == "gi2" })
+    }
+
+    @Test
+    fun acceptsPinyinInitials() {
+        assertEquals("台語", top("dai5gi2").hanlo)
+        assertEquals("水", top("zui").hanlo)
+        assertEquals("tak-ke-ho", engine.segment("dakkeho").first().joinToString("-") { it.base })
+    }
+
+    @Test
+    fun pinyinHabitRulesMatchLooseSpelling() {
+        assertTrue(engine.candidates("dageho").none { it.hanlo == "逐家好" })
+        val loose = CandidateEngine(lexicon.withRules(FuzzyRule.DEFAULTS + FuzzyRule.ENTERING_TONE + FuzzyRule.VOICING))
+        val top = loose.candidates("dageho").first()
+        assertEquals("逐家好", top.hanlo)
+        assertEquals("ta̍k-ke-hó", top.tailo)
+        // Mixed-up entering-tone codas match too.
+        assertEquals("逐家好", loose.candidates("tatkeho").first().hanlo)
     }
 
     @Test

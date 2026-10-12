@@ -67,6 +67,28 @@ object Romanization {
     }
 
     /**
+     * Rewrites a typed syllable's Mandarin-pinyin initial as the Taigi one it usually stands for:
+     * `d` → `t`, `z`/`zh` → `ts`, `c`/`q` → `tsh`, `x` → `s`. None of these letters occur in POJ or
+     * Tâi-lô (POJ `ch` is left alone), so the rewrite never turns valid input into something else.
+     * Applied to typed input only, never to dictionary data.
+     */
+    fun respellPinyinInitial(text: String): String {
+        if (text.isEmpty()) return text
+        val lower = text.lowercase()
+        val (length, replacement) = when {
+            lower.startsWith("zh") -> 2 to "ts"
+            lower[0] == 'z' -> 1 to "ts"
+            lower[0] == 'c' && !lower.startsWith("ch") -> 1 to "tsh"
+            lower[0] == 'q' -> 1 to "tsh"
+            lower[0] == 'x' -> 1 to "s"
+            lower[0] == 'd' -> 1 to "t"
+            else -> return text
+        }
+        val initial = if (text[0].isUpperCase()) replacement.replaceFirstChar { it.uppercaseChar() } else replacement
+        return initial + text.substring(length)
+    }
+
+    /**
      * Parses one syllable such as `Tâi`, `tai5`, `chhiⁿ`, `tshinn7` or `o͘`. Returns `null` if the
      * text contains anything other than letters, tone marks and a single trailing tone digit.
      * The syllable's tone is [Syllable.TONE_UNSPECIFIED] if no tone was written.
