@@ -67,6 +67,15 @@ class LexiconAssetTest {
     }
 
     @Test
+    fun neutralToneEntries() {
+        for (raw in listOf("tnglai", "tng2lai5", "amgonge")) {
+            val top = engine.candidates(raw).take(3).map { it.tailo }
+            assertTrue("$raw → $top", top.any { "--" in it })
+        }
+        assertTrue(engine.candidates("tng--khi").first().tailo == "tńg--khì")
+    }
+
+    @Test
     fun longInputIsFast() {
         val start = System.nanoTime()
         repeat(20) { engine.candidates("guasiutaioanlanggongbekongtaigi") }

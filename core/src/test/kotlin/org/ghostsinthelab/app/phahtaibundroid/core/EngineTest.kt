@@ -30,6 +30,16 @@ class EngineTest {
         LexiconEntry("閣", null, "koh4", 6),
         LexiconEntry("逐家好", null, "tak8-ke1-ho2", 5),
         LexiconEntry("罩", null, "ta3", 3),
+        LexiconEntry("轉", null, "tng2", 4),
+        LexiconEntry("轉去", null, "tng2-khi3", 5),
+        LexiconEntry("轉去", null, "tng2--khi3", 4),
+        LexiconEntry("轉來", null, "tng2--lai5", 2),
+        LexiconEntry("食", null, "tsiah8", 6),
+        LexiconEntry("食飽", null, "tsiah8-pa2", 4),
+        LexiconEntry("ah", null, "ah4", 3),
+        LexiconEntry("你", null, "li2", 6),
+        LexiconEntry("好", null, "ho2", 6),
+        LexiconEntry("感謝", null, "kam2-sia7", 6),
     )
     private val lexicon = Lexicon(entries)
     private val engine = CandidateEngine(lexicon)
@@ -112,7 +122,7 @@ class EngineTest {
         assertNull(composer.select(first))
         assertEquals("講koh", composer.preview())
         composer.toggleMode()
-        assertEquals("kóng koh", composer.preview())
+        assertEquals("kóng-koh", composer.preview())
         composer.toggleMode()
         assertEquals("講閣", composer.commitFirst())
         assertTrue(!composer.isComposing)
@@ -145,6 +155,62 @@ class EngineTest {
         val shown = composer.displayCandidates().map { it.text }
         assertEquals(shown.distinct(), shown)
         assertEquals("Gí", shown.first())
+    }
+
+    @Test
+    fun romanModeHyphenatesPiecesTypedAsOneRun() {
+        val composer = Composer(engine, mode = OutputMode.ROMAN)
+        "lihokamsia".forEach(composer::type)
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "你" }))
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "好" }))
+        assertEquals("lí-hó-kám-siā", composer.select(composer.candidates.indexOfFirst { it.hanlo == "感謝" }))
+    }
+
+    @Test
+    fun romanModeKeepsTypedSeparators() {
+        val composer = Composer(engine, mode = OutputMode.ROMAN)
+        "Tsiahpa--ah".forEach(composer::type)
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "食飽" }))
+        assertEquals("ah", composer.rawInput)
+        assertEquals("Tsia̍h-pá--ah", composer.preview())
+        composer.toggleMode()
+        assertEquals("食飽ah", composer.preview())
+        repeat(3) { composer.backspace() } // the selection comes back with its separator
+        assertEquals("Tsiahpa--", composer.rawInput)
+    }
+
+    @Test
+    fun hanloModeSeparatesAdjacentRomanizedPieces() {
+        val composer = Composer(engine)
+        "ahah".forEach(composer::type)
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "ah" }))
+        assertEquals("ah-ah", composer.commitFirst())
+    }
+
+    @Test
+    fun neutralToneEntriesMatchWithoutDoubleHyphen() {
+        for (raw in listOf("tnglai", "tng-lai", "tng2lai5", "tng--lai")) {
+            val top = top(raw)
+            assertEquals(raw, "轉來", top.hanlo)
+            assertEquals(raw, "tńg--lâi", top.tailo)
+            assertEquals(raw, "tńg--lâi", top.poj)
+        }
+    }
+
+    @Test
+    fun typedDoubleHyphenPrefersNeutralTone() {
+        assertEquals("tńg-khì", top("tngkhi").tailo)
+        assertEquals("tńg--khì", top("tng--khi").tailo)
+    }
+
+    @Test
+    fun typedDoubleHyphenOffersNeutralSuffixes() {
+        val top = top("tsiahpa--ah")
+        assertEquals("食飽矣", top.hanlo)
+        assertEquals("tsia̍h-pá--ah", top.tailo)
+        assertEquals("tsiah8-pa2--ah4", top.numeric)
+        // Without the user's `--`, no guessed compounds.
+        assertTrue(engine.candidates("tsiahpaah").none { it.hanlo == "食飽矣" })
     }
 
     @Test

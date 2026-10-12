@@ -1,5 +1,6 @@
 package org.ghostsinthelab.app.phahtaibundroid.core.engine
 
+import org.ghostsinthelab.app.phahtaibundroid.core.romanization.Boundary
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 
 /**
@@ -16,7 +17,23 @@ class Composer(
     var mode: OutputMode = OutputMode.HANLO,
     private val history: UserHistory = UserHistory.None,
 ) {
-    private class Selection(val candidate: Candidate, val raw: String)
+    /** A selected piece; [raw] is the input it consumed, including separators typed after it. */
+    private class Selection(val candidate: Candidate, val raw: String) {
+        /**
+         * How the piece joins the next one in romanization: the user's own separator, so pieces
+         * typed as one run (`lihokamsia`) stay one hyphenated word, `--` stays neutral tone, and
+         * only typed whitespace separates words.
+         */
+        val boundary: Boundary
+            get() {
+                val separator = raw.takeLastWhile { !it.isLetterOrDigit() }
+                return when {
+                    separator.any(Char::isWhitespace) -> Boundary.SPACE
+                    "--" in separator -> Boundary.NEUTRAL
+                    else -> Boundary.HYPHEN
+                }
+            }
+    }
 
     /** A candidate as shown to the user; [index] refers to [candidates]. */
     data class DisplayCandidate(val text: String, val index: Int)
@@ -53,9 +70,10 @@ class Composer(
     fun select(index: Int): String? {
         val candidate = candidates.getOrNull(index) ?: return null
         history.record(candidate.hanlo, candidate.numeric)
-        selections += Selection(candidate, raw.substring(0, candidate.consumed))
-        raw.delete(0, candidate.consumed)
-        while (raw.isNotEmpty() && !raw[0].isLetterOrDigit()) raw.deleteCharAt(0)
+        var end = candidate.consumed
+        while (end < raw.length && !raw[end].isLetterOrDigit()) end++
+        selections += Selection(candidate, raw.substring(0, end))
+        raw.delete(0, end)
         if (raw.isEmpty()) return finish()
         refresh()
         return null
@@ -76,14 +94,27 @@ class Composer(
         }
     }
 
-    /** Selected pieces in the current mode, followed by the unconverted input as romanization. */
+    /**
+     * Selected pieces in the current mode, followed by the unconverted input as romanization.
+     * Romanized pieces are joined by the separator typed between them (see [Selection.boundary]);
+     * Hàn-lô pieces are concatenated, except that two romanized neighbours still get a separator.
+     */
     fun preview(): String {
-        val parts = selections.map { casedText(it.candidate, it.raw) }.toMutableList()
+        val pieces = selections.map { casedText(it.candidate, it.raw) to it.boundary }.toMutableList()
         if (raw.isNotEmpty()) {
-            parts += candidates.firstOrNull { it.hanlo == null && it.consumed == raw.length }
+            val rest = candidates.firstOrNull { it.hanlo == null && it.consumed == raw.length }
                 ?.roman(system) ?: raw.toString()
+            pieces += rest to Boundary.HYPHEN
         }
-        return parts.joinToString(if (mode == OutputMode.ROMAN) " " else "")
+        return buildString {
+            for ((i, piece) in pieces.withIndex()) {
+                val text = piece.first
+                if (i > 0 && (mode == OutputMode.ROMAN || (isRoman(last()) && isRoman(text.first())))) {
+                    append(pieces[i - 1].second.text)
+                }
+                append(text)
+            }
+        }
     }
 
     fun toggleMode() {
@@ -99,6 +130,12 @@ class Composer(
         raw.setLength(0)
         selections.clear()
         candidates = emptyList()
+    }
+
+    /** Whether [c] belongs to romanized text (Latin letters, digits, combining marks such as o͘). */
+    private fun isRoman(c: Char): Boolean = when (Character.UnicodeScript.of(c.code)) {
+        Character.UnicodeScript.LATIN, Character.UnicodeScript.INHERITED -> true
+        else -> c in '0'..'9'
     }
 
     private fun finish(): String = preview().also { reset() }
