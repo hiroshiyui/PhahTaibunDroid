@@ -6,7 +6,7 @@ Known gaps and planned work. Check items off (or remove them) as they land, and 
 
 - [x] Hide the keyboard's own 🌐 key when the system already shows an IME-switcher button in the navigation bar (both appear on a Pixel 8a emulator).
 - [x] Tone-hint labels `ah` / `a̍h` overlap the digits on the 4 and 8 keys.
-- [ ] The settings screen's "Try it" field stays hidden behind the keyboard; scroll it into view on focus.
+- [x] The settings screen's "Try it" field stays hidden behind the keyboard; scroll it into view on focus.
 - [ ] Replace the Android Studio template launcher icon.
 
 ## Input engine
