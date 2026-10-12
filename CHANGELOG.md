@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Learning from the user's choices, disabled in incognito fields; conversion bypassed in password, e-mail and URL fields.
 - Lexicon of 86,340 entries compiled from ChhoeTaigi datasets: 台文華文線頂辭典 (CC BY-SA 4.0) and iTaigi 華台對照典 (CC0).
 - Setup and settings screen (romanization system, default output, fuzzy rules), in English and Traditional Chinese.
+- Per-app language: English or Traditional Chinese can be chosen in the system's App info → Language (Android 13+), independently of the device language.
 - GPL-3.0-or-later license, third-party `NOTICE`, and bilingual `README.md`.
 
 ### Changed

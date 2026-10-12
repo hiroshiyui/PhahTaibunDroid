@@ -34,6 +34,11 @@ android {
     buildFeatures {
         compose = true
     }
+    androidResources {
+        // Lists the bundled UI languages in the manifest so users can pick one
+        // under Settings → Apps → 拍台文 → Language (Android 13+).
+        generateLocaleConfig = true
+    }
 }
 
 dependencies {
