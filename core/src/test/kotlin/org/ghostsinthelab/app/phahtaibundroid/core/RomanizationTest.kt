@@ -86,6 +86,46 @@ class RomanizationTest {
         }
     }
 
+    /** Cases where Romanization disagreed with the KeSi converter, with the convention we follow. */
+    @Test
+    fun kesiCrossCheck() {
+        // numeric input → Tâi-lô, POJ
+        val rendered = listOf(
+            // Tâi-lô `ere` marks the second e (MOE handbook: erê 鞋); KeSi agrees, we used to mark the first.
+            Triple("ere5", "erê", "êre"),
+            Triple("kere1-nng6", "kere-nňg", "kere-nňg"),
+            Triple("tsere8", "tsere̍", "che̍re"),
+            // POJ marks the a of `au` even before a final h (台華線頂對照典 tha̍uh); KeSi writes thau̍h.
+            Triple("thauh8", "tha̍uh", "tha̍uh"),
+            Triple("haunnh8", "ha̍unnh", "ha̍uⁿh"),
+            // POJ `oa`/`oe` mark the o only when open (optionally nasal); KeSi agrees.
+            Triple("khuannh8", "khua̍nnh", "khoa̍ⁿh"),
+            Triple("kueh8", "kue̍h", "koe̍h"),
+            Triple("uainnh8", "ua̍innh", "oa̍iⁿh"),
+            // o͘ with a tone: the mark goes on the o, before U+0358 (NFC order).
+            Triple("ooh8", "o̍oh", "o̍͘h"),
+            // Tone 9: double acute in Tâi-lô, breve in POJ.
+            Triple("kang9", "ka̋ng", "kăng"),
+        )
+        for ((numeric, tailo, poj) in rendered) {
+            assertEquals(numeric, tailo, render(numeric, TAILO))
+            assertEquals(numeric, poj, render(numeric, POJ))
+        }
+        // typed or dictionary spelling → canonical numeric
+        val parsed = listOf(
+            // Nasal o has no o/o͘ contrast: Tâi-lô `onn`, POJ `oⁿ`; `o͘ⁿ`/`oonn` normalize to it (as KeSi does).
+            "hō͘ⁿ" to "honn7",
+            "hoonn3" to "honn3",
+            // POJ ṳ / o̤ (台華線頂對照典, ChhoeTaigi) are Tâi-lô ir / er; KeSi passes them through unparsed.
+            "sṳ́" to "sir2",
+            "khṳ̀" to "khir3",
+            "Ṳ" to "Ir",
+            "o̤" to "er",
+            "pe̍h-ōe-jī" to "peh8-ue7-ji7",
+        )
+        for ((text, numeric) in parsed) assertEquals(text, numeric, numeric(text))
+    }
+
     @Test
     fun implicitTones() {
         assertEquals(1, Syllable("tai").withImplicitTone().tone)

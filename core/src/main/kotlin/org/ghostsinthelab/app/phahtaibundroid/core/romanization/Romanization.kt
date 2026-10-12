@@ -9,11 +9,13 @@ enum class RomanSystem { POJ, TAILO }
  *
  * Parsing accepts either system, with tones given as Unicode diacritics (`Tâi-gí`, `Tâi-gí`) or
  * trailing digits (`tai5-gi2`), and ASCII stand-ins for special letters (`oo`/`ou` for `o͘`,
- * `nn` for `ⁿ`). Everything is normalized to Tâi-lô [Syllable.base]s.
+ * `nn` for `ⁿ`). POJ `ṳ`/`o̤` are read as Tâi-lô `ir`/`er`. Everything is normalized to Tâi-lô
+ * [Syllable.base]s.
  */
 object Romanization {
     private const val DOT_ABOVE_RIGHT = '͘' // POJ o͘
     private const val SUPERSCRIPT_N = 'ⁿ'
+    private const val DIAERESIS_BELOW = '̤' // POJ ṳ (Tâi-lô ir) and o̤ (Tâi-lô er)
 
     private val MARK_TO_TONE = mapOf(
         '́' to 2, // acute
@@ -63,7 +65,8 @@ object Romanization {
         }
         // POJ always writes ⁿ before a final h; tolerate the reverse order in typed input.
         if (b.endsWith("hnn")) b = b.dropLast(3) + "nnh"
-        return b
+        // Nasal o has no o/o͘ contrast; Tâi-lô writes it `onn` (POJ `oⁿ`), so `o͘ⁿ`/`oonn` is the same.
+        return b.replace("oonn", "onn")
     }
 
     /**
@@ -103,6 +106,15 @@ object Romanization {
                 c in IGNORED -> Unit
                 c == DOT_ABOVE_RIGHT -> letters.append('o')
                 c == SUPERSCRIPT_N -> letters.append("nn")
+                c == DIAERESIS_BELOW -> {
+                    val vowel = when (letters.lastOrNull()) {
+                        'u' -> 'i'
+                        'o' -> 'e'
+                        else -> return null
+                    }
+                    letters.setCharAt(letters.lastIndex, vowel)
+                    letters.append('r')
+                }
                 c in MARK_TO_TONE -> tone = MARK_TO_TONE.getValue(c)
                 c == 'ı' -> letters.append('i')
                 c in 'a'..'z' -> letters.append(c)
@@ -211,6 +223,8 @@ object Romanization {
         }
         idx('a')?.let { return it }
         spelled.indexOf("oo").takeIf { it >= 0 }?.let { return it }
+        // The ere diphthong marks its second e (MOE Tâi-lô handbook: erê 鞋).
+        spelled.indexOf("ere").takeIf { it >= 0 }?.let { return it + 2 }
         idx('e')?.let { return it }
         idx('o')?.let { return it }
         val i = spelled.indexOf('i')
