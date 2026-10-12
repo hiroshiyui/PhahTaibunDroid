@@ -34,7 +34,7 @@ You are committing and pushing code changes for Phah Taibun Droid.
    - Build artifacts (`build/`, `*/build/`)
    - Downloaded dictionary sources in `data/sources/` (fetched by `scripts/fetch-lexicon-sources.sh`)
 
-   `app/src/main/assets/lexicon.tsv` **is** committed even though it is generated, so the app builds without network access. When it changes, mention the regeneration in the commit message.
+   `app/src/main/assets/lexicon.tsv` and `bigrams.tsv` **are** committed even though they are generated, so the app builds without network access. When they change, mention the regeneration in the commit message.
 3. **Commit** — use `--signoff` flag. Pass the message via HEREDOC for proper formatting:
    ```bash
    git commit --signoff -m "$(cat <<'EOF'

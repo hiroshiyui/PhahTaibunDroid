@@ -27,6 +27,8 @@ class Candidate(
     val numeric: String,
     val consumed: Int,
     val score: Int,
+    /** The lexicon entries this candidate is made of (several for a multi-word phrase). */
+    val entries: List<LexiconEntry> = emptyList(),
 ) {
     fun roman(system: RomanSystem) = if (system == RomanSystem.POJ) poj else tailo
 
@@ -64,10 +66,15 @@ class CandidateEngine(
     private val history: UserHistory = UserHistory.None,
 ) {
     private val segmenter = Segmenter(lexicon)
+    private val phrases = PhraseFinder(lexicon, history)
 
     fun segment(raw: String): List<List<InputSyllable>> = segmenter.segment(raw)
 
-    fun candidates(raw: String, limit: Int = 80): List<Candidate> {
+    /**
+     * Ranked candidates for [raw]. [context] is the word selected just before (e.g. the last
+     * piece of the composition); words that often follow it are boosted.
+     */
+    fun candidates(raw: String, limit: Int = 80, context: LexiconEntry? = null): List<Candidate> {
         val segmentations = segmenter.segment(raw)
         if (segmentations.isEmpty()) return emptyList()
         val best = HashMap<String, Candidate>()
@@ -102,19 +109,31 @@ class CandidateEngine(
                 } else {
                     PARTIAL_MATCH_PER_SYLLABLE * k - patternPenalty / PARTIAL_PATTERN_DIVISOR
                 }
-                val found = entries.mapNotNull { fromEntry(it, prefix, coverage) }
+                val found = entries.mapNotNull { fromEntry(it, prefix, coverage, context) }
                 // Pattern matches are many and weights are coarse: keep only the best scored.
                 val kept = if (abbreviated || wildcard) found.sortedByDescending { it.score }.take(PATTERN_LIMIT) else found
                 kept.forEach(::offer)
             }
-            neutralSuffixCandidates(seg, FULL_MATCH - segPenalty - RULE_PENALTY).forEach(::offer)
+            neutralSuffixCandidates(seg, FULL_MATCH - segPenalty - RULE_PENALTY, context).forEach(::offer)
+        }
+        // Multi-word conversions of the whole input, unless much less likely than a single word.
+        // Abbreviated and wildcard input stays with single-word matches.
+        val phrases = segmentations
+            .filter { seg -> seg.none { it.kind == InputSyllable.Kind.INITIAL || it.kind == InputSyllable.Kind.WILDCARD } }
+            .take(PHRASE_SEGMENTATIONS).mapNotNull { seg ->
+            phraseCandidate(seg, context, FULL_MATCH - (seg.size - fewestSyllables) * EXTRA_SYLLABLE_PENALTY)
+        }.sortedByDescending { it.score }
+        if (phrases.isNotEmpty()) {
+            val bestWord = best.values.filter { it.entries.size == 1 && it.consumed == raw.length }.maxOfOrNull { it.score }
+            val floor = maxOf(bestWord ?: Int.MIN_VALUE, phrases.first().score) - PHRASE_MARGIN
+            phrases.filter { it.score >= floor }.take(MAX_PHRASES).forEach(::offer)
         }
         // Abbreviations have no romanization of their own; show those as typed.
         offer(romanCandidate(raw, segmentations.firstOrNull { seg -> seg.none { it.kind == InputSyllable.Kind.INITIAL } }))
         return best.values.sortedByDescending { it.score }.take(limit)
     }
 
-    private fun fromEntry(entry: LexiconEntry, input: List<InputSyllable>, coverage: Int): Candidate? {
+    private fun fromEntry(entry: LexiconEntry, input: List<InputSyllable>, coverage: Int, context: LexiconEntry?): Candidate? {
         val syllables = entry.syllables()
         if (syllables.size != input.size) return null
         var score = coverage + (ln(1.0 + entry.weight) * WEIGHT_FACTOR).toInt()
@@ -137,6 +156,7 @@ class CandidateEngine(
         }
         val hanlo = entry.hanlo
         score += history.boost(hanlo, entry.romanization)
+        if (context != null) score += phrases.contextBonus(context, entry)
         return Candidate(
             hanlo = hanlo,
             hanloPoj = entry.hanloPoj,
@@ -145,6 +165,7 @@ class CandidateEngine(
             numeric = entry.romanization,
             consumed = input.last().rawEnd,
             score = score,
+            entries = listOf(entry),
         )
     }
 
@@ -154,7 +175,7 @@ class CandidateEngine(
      * dictionary lacks. Only the user's own `--` triggers this, so ordinary input never sees
      * such guesses, and only the best-matching word is guessed (no homophone flood).
      */
-    private fun neutralSuffixCandidates(seg: List<InputSyllable>, coverage: Int): List<Candidate> {
+    private fun neutralSuffixCandidates(seg: List<InputSyllable>, coverage: Int, context: LexiconEntry?): List<Candidate> {
         if (seg.any { it.kind != InputSyllable.Kind.COMPLETE }) return emptyList()
         val found = ArrayList<Candidate>()
         for (j in 1 until seg.size) {
@@ -170,11 +191,51 @@ class CandidateEngine(
                     romanization = "${head.romanization}--$numeric",
                     weight = head.weight,
                 )
-                fromEntry(entry, seg, coverage)
+                fromEntry(entry, seg, coverage, context)
             }.maxByOrNull { it.score } ?: continue
         }
         return found
     }
+
+    /**
+     * The most likely multi-word conversion of the whole of [input] (see [PhraseFinder]), or
+     * `null` if there is none or it is a single entry (already offered by itself). Words are
+     * joined with spaces in romanization; in Hàn-lô only between two romanized words.
+     */
+    private fun phraseCandidate(input: List<InputSyllable>, context: LexiconEntry?, coverage: Int): Candidate? {
+        if (input.size < 2) return null
+        val phrase = phrases.best(input, context) ?: return null
+        val words = phrase.entries
+        if (words.size < 2) return null
+        val syllables = words.map { it.syllables() }
+        val hanlo = joinHanlo(words.map { it.hanlo })
+        val hanloPoj = joinHanlo(words.map { it.hanloPoj ?: it.hanlo })
+        val numeric = words.joinToString(" ") { it.romanization }
+        // A typed `--` asks for neutral tone, which a break between two words can't give.
+        val flat = syllables.flatMap { word -> word.mapIndexed { i, syllable -> syllable.takeIf { i > 0 } } }
+        val neutral = input.indices.drop(1).filter { input[it].boundary == Boundary.NEUTRAL }
+            .sumOf { if (flat.getOrNull(it)?.boundary == Boundary.NEUTRAL) NEUTRAL_MATCH else NEUTRAL_MISMATCH }
+        return Candidate(
+            hanlo = hanlo,
+            hanloPoj = hanloPoj.takeIf { it != hanlo },
+            tailo = syllables.joinToString(" ") { Romanization.render(it, RomanSystem.TAILO) },
+            poj = syllables.joinToString(" ") { Romanization.render(it, RomanSystem.POJ) },
+            numeric = numeric,
+            consumed = input.last().rawEnd,
+            score = coverage + phrase.score + neutral + history.boost(hanlo, numeric),
+            entries = words,
+        )
+    }
+
+    private fun joinHanlo(words: List<String>): String = buildString {
+        for (w in words) {
+            if (isNotEmpty() && last().isLatin() && w.first().isLatin()) append(' ')
+            append(w)
+        }
+    }
+
+    private fun Char.isLatin() = Character.UnicodeScript.of(code) == Character.UnicodeScript.LATIN ||
+        Character.getType(this) == Character.NON_SPACING_MARK.toInt()
 
     /** The whole input rendered as typed, converting tone digits to marks. */
     private fun romanCandidate(raw: String, segmentation: List<InputSyllable>?): Candidate {
@@ -205,9 +266,9 @@ class CandidateEngine(
         private const val PARTIAL_MATCH_PER_SYLLABLE = 1_000
         private const val EXTRA_SYLLABLE_PENALTY = 300
         private const val ROMAN_CANDIDATE = 500
-        private const val EXACT_SPELLING = 40
-        private const val TONE_MATCH = 60
-        private const val TONE_MISMATCH = -400
+        internal const val EXACT_SPELLING = 40
+        internal const val TONE_MATCH = 60
+        internal const val TONE_MISMATCH = -400
         private const val WEIGHT_FACTOR = 30.0
         private const val PREFIX_LIMIT = 30
         private const val NEUTRAL_MATCH = 60
@@ -231,5 +292,10 @@ class CandidateEngine(
         private const val ABBREVIATION_PENALTY = 3_000
         private const val WILDCARD_PENALTY = 1_000
         private const val PARTIAL_PATTERN_DIVISOR = 10
+        private const val PHRASE_SEGMENTATIONS = 4
+        private const val MAX_PHRASES = 2
+
+        /** Phrases scoring this much below the best phrase or whole-input word are dropped. */
+        private const val PHRASE_MARGIN = 150
     }
 }

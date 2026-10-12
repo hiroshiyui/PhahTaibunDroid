@@ -146,20 +146,29 @@ class Segmenter(private val lexicon: Lexicon) {
         }
         if (!reachable[0]) return emptyList()
 
+        // Fewest syllables needed from each position to the end.
+        val minRest = IntArray(n + 1) { if (it == n) 0 else Int.MAX_VALUE / 2 }
+        for (i in n - 1 downTo 0) for ((j, _) in pieces[i]) minRest[i] = minOf(minRest[i], minRest[j] + 1)
+
+        // Enumerate segmentations of exactly `total` syllables for increasing totals, so that the
+        // fewest-syllable ones are all found before the limit is reached in long input.
         val results = ArrayList<List<InputSyllable>>()
-        fun dfs(i: Int, acc: MutableList<InputSyllable>) {
-            if (results.size >= MAX_SEGMENTATIONS) return
+        var steps = 0
+        fun dfs(i: Int, acc: MutableList<InputSyllable>, total: Int) {
+            if (results.size >= MAX_SEGMENTATIONS || ++steps > MAX_SEARCH_STEPS) return
             if (i == n) {
-                results += acc.toList()
+                if (acc.size == total) results += acc.toList()
                 return
             }
             for ((j, kind) in pieces[i]) {
+                if (acc.size + 1 + minRest[j] > total) continue
                 acc += piece(run, i, j, kind)
-                dfs(j, acc)
+                dfs(j, acc, total)
                 acc.removeAt(acc.lastIndex)
             }
         }
-        dfs(0, ArrayList())
+        var total = minRest[0]
+        while (results.size < MAX_SEGMENTATIONS && total <= n) dfs(0, ArrayList(), total++)
         return results.sortedWith(
             compareBy(
                 { s -> s.count { it.kind == InputSyllable.Kind.INITIAL } },
@@ -211,6 +220,7 @@ class Segmenter(private val lexicon: Lexicon) {
 
     companion object {
         const val MAX_SEGMENTATIONS = 16
+        private const val MAX_SEARCH_STEPS = 20_000
 
         /** Parses a typed syllable, accepting Mandarin-pinyin initials such as `d` for `t`. */
         private fun parseTyped(s: String) = Romanization.parseSyllable(Romanization.respellPinyinInitial(s))

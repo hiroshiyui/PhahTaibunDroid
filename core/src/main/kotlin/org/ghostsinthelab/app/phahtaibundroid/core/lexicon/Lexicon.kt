@@ -39,10 +39,13 @@ class SyllablePattern(val initials: String, val matches: (String) -> Boolean)
 /**
  * In-memory index over [LexiconEntry]s, keyed by sequences of fuzzy-collapsed ("loose") syllable
  * bases. Rebuild with [withRules] when the user changes fuzzy settings; parsed entries are reused.
+ *
+ * @property bigrams Word-pair counts between [entries] (see [Bigrams.read]).
  */
 class Lexicon(
     val entries: List<LexiconEntry>,
     val rules: Set<FuzzyRule> = FuzzyRule.DEFAULTS,
+    val bigrams: Bigrams = Bigrams.NONE,
 ) {
     private val byKey = HashMap<String, MutableList<LexiconEntry>>(entries.size)
     private val sortedKeys: Array<String>
@@ -84,7 +87,7 @@ class Lexicon(
         for ((k, keys) in grouped) byInitials[k] = keys.toTypedArray()
     }
 
-    fun withRules(rules: Set<FuzzyRule>): Lexicon = if (rules == this.rules) this else Lexicon(entries, rules)
+    fun withRules(rules: Set<FuzzyRule>): Lexicon = if (rules == this.rules) this else Lexicon(entries, rules, bigrams)
 
     fun loosen(base: String): String = FuzzyRule.loosen(base, rules)
 

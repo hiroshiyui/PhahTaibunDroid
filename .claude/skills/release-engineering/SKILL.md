@@ -24,7 +24,7 @@ For minor or major bumps, edit `app/build.gradle.kts` manually — the task only
 ## Release Process
 
 1. **Ensure all changes are committed** on the working branch.
-2. **Check the lexicon** — if the dictionary sources or `tools/dictbuilder` changed since the last release, regenerate with `./scripts/fetch-lexicon-sources.sh && ./gradlew :tools:dictbuilder:buildLexicon` and commit `app/src/main/assets/lexicon.tsv` first.
+2. **Check the lexicon** — if the dictionary sources or `tools/dictbuilder` changed since the last release, regenerate with `./scripts/fetch-lexicon-sources.sh && ./gradlew :tools:dictbuilder:buildLexicon` and commit `app/src/main/assets/lexicon.tsv` and `bigrams.tsv` first.
 3. **Bump version** — run `./gradlew bumpPatchVersion` or edit `app/build.gradle.kts` manually for minor/major bumps.
 4. **Write changelogs** for F-Droid (see Changelog section below), and in `CHANGELOG.md` move the `## [Unreleased]` entries under a new `## [X.Y.Z] - YYYY-MM-DD` heading, leaving an empty `## [Unreleased]` section on top.
 5. **Run the tests** — `./gradlew :core:test :app:testDebugUnitTest`, so the tag lands on a known good state.

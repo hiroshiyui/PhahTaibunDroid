@@ -1,8 +1,10 @@
 package org.ghostsinthelab.app.phahtaibundroid.core
 
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
+import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Bigrams
 import org.ghostsinthelab.app.phahtaibundroid.core.lexicon.Lexicon
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.BeforeClass
@@ -13,6 +15,7 @@ import java.io.File
 class LexiconAssetTest {
     companion object {
         private lateinit var engine: CandidateEngine
+        private lateinit var bigrams: Bigrams
 
         @BeforeClass
         @JvmStatic
@@ -20,8 +23,11 @@ class LexiconAssetTest {
             val file = File("../app/src/main/assets/lexicon.tsv")
             assumeTrue("lexicon asset not built", file.isFile)
             val start = System.nanoTime()
-            val lexicon = Lexicon(file.inputStream().use(Lexicon::readEntries))
-            println("loaded ${lexicon.entries.size} entries in ${(System.nanoTime() - start) / 1_000_000} ms")
+            val entries = file.inputStream().use(Lexicon::readEntries)
+            val bigramFile = File("../app/src/main/assets/bigrams.tsv")
+            bigrams = if (bigramFile.isFile) bigramFile.inputStream().use { Bigrams.read(it, entries) } else Bigrams.NONE
+            val lexicon = Lexicon(entries, bigrams = bigrams)
+            println("loaded ${lexicon.entries.size} entries and ${bigrams.size} word pairs in ${(System.nanoTime() - start) / 1_000_000} ms")
             engine = CandidateEngine(lexicon)
         }
     }
@@ -100,6 +106,35 @@ class LexiconAssetTest {
             println("$raw: $perCall ms per lookup → ${engine.candidates(raw).take(5).map { it.hanlo ?: it.tailo }}")
             assertTrue("$raw too slow: $perCall ms", perCall < 200)
         }
+    }
+
+    @Test
+    fun wordPairsResolveAgainstTheLexicon() {
+        // Every pair in the asset names words in lexicon.tsv (regenerate both together).
+        val lines = File("../app/src/main/assets/bigrams.tsv").readLines().count { it.isNotEmpty() && it[0] != '#' }
+        assertEquals(lines, bigrams.size)
+    }
+
+    @Test
+    fun commonWordsStayFirst() {
+        for ((raw, word) in listOf("taigi" to "台語", "liho" to "你好", "kamsia" to "感謝", "sinbun" to "新聞")) {
+            assertEquals(raw, word, engine.candidates(raw).first().hanlo)
+        }
+    }
+
+    @Test
+    fun longInputConvertsAsPhrases() {
+        fun top(raw: String) = engine.candidates(raw).first().let { it.hanlo to it.consumed }
+        assertEquals("我是台灣人" to 15, top("guasitaioanlang"))
+        assertEquals("最近天氣真好" to 21, top("tsuekinthinnkhitsinho"))
+        val long = "guasitaioanlanggongbekongtaigi"
+        val first = engine.candidates(long).first()
+        assertEquals(long.length, first.consumed)
+        assertTrue(first.hanlo, first.hanlo!!.startsWith("我是台灣人"))
+        assertEquals(
+            listOf("gua", "si", "tai", "uan", "lang", "gong", "be", "kong", "tai", "gi"),
+            engine.segment(long).first().map { it.base },
+        )
     }
 
     @Test

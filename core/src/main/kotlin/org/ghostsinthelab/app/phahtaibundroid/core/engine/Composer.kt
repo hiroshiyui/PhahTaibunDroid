@@ -123,7 +123,11 @@ class Composer(
 
     /** Re-runs the engine, e.g. after the lexicon or fuzzy rules changed. */
     fun refresh() {
-        candidates = if (raw.isEmpty()) emptyList() else engine.candidates(raw.toString())
+        candidates = if (raw.isEmpty()) {
+            emptyList()
+        } else {
+            engine.candidates(raw.toString(), context = selections.lastOrNull()?.candidate?.entries?.lastOrNull())
+        }
     }
 
     fun reset() {
