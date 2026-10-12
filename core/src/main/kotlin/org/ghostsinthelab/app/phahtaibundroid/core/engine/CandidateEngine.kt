@@ -56,7 +56,8 @@ interface UserHistory {
  * Every alternative segmentation is tried; for each, the longest syllable prefixes are looked
  * up first so whole-input matches outrank partial ones (which the user selects piece by piece).
  * A pure romanization candidate of the whole input is always included so out-of-dictionary
- * words can still be typed.
+ * words can still be typed. Abbreviated (`tg`) and wildcard (`s?ah`) syllables are matched by
+ * pattern and rank below fully spelled matches.
  */
 class CandidateEngine(
     val lexicon: Lexicon,
@@ -82,20 +83,34 @@ class CandidateEngine(
             for (k in seg.size downTo 1) {
                 val prefix = seg.subList(0, k)
                 if (prefix.any { it.kind == InputSyllable.Kind.UNKNOWN }) continue
+                val abbreviated = prefix.any { it.kind == InputSyllable.Kind.INITIAL }
+                val wildcard = prefix.any { it.kind == InputSyllable.Kind.WILDCARD }
+                // A single abbreviated syllable would match far too much to be useful.
+                if (abbreviated && k < 2) continue
                 val last = prefix.last()
-                val entries = if (last.kind == InputSyllable.Kind.PARTIAL) {
+                val entries = if (abbreviated || wildcard) {
+                    val patterns = prefix.mapNotNull { SyllablePatterns.of(lexicon, it) }
+                    if (patterns.size == k) lexicon.lookupMatching(patterns, PATTERN_FETCH) else emptyList()
+                } else if (last.kind == InputSyllable.Kind.PARTIAL) {
                     lexicon.lookupPrefix(prefix.dropLast(1).map { it.loose }, last.loose, PREFIX_LIMIT)
                 } else {
                     lexicon.lookup(prefix.map { it.loose })
                 }
-                for (entry in entries) {
-                    val coverage = if (k == seg.size) FULL_MATCH - segPenalty else PARTIAL_MATCH_PER_SYLLABLE * k
-                    offer(fromEntry(entry, prefix, coverage) ?: continue)
+                val patternPenalty = (if (abbreviated) ABBREVIATION_PENALTY else 0) + (if (wildcard) WILDCARD_PENALTY else 0)
+                val coverage = if (k == seg.size) {
+                    FULL_MATCH - segPenalty - patternPenalty
+                } else {
+                    PARTIAL_MATCH_PER_SYLLABLE * k - patternPenalty / PARTIAL_PATTERN_DIVISOR
                 }
+                val found = entries.mapNotNull { fromEntry(it, prefix, coverage) }
+                // Pattern matches are many and weights are coarse: keep only the best scored.
+                val kept = if (abbreviated || wildcard) found.sortedByDescending { it.score }.take(PATTERN_LIMIT) else found
+                kept.forEach(::offer)
             }
             neutralSuffixCandidates(seg, FULL_MATCH - segPenalty - RULE_PENALTY).forEach(::offer)
         }
-        offer(romanCandidate(raw, segmentations.first()))
+        // Abbreviations have no romanization of their own; show those as typed.
+        offer(romanCandidate(raw, segmentations.firstOrNull { seg -> seg.none { it.kind == InputSyllable.Kind.INITIAL } }))
         return best.values.sortedByDescending { it.score }.take(limit)
     }
 
@@ -112,6 +127,8 @@ class CandidateEngine(
             when {
                 typed.kind == InputSyllable.Kind.PARTIAL ->
                     if (actual.base.startsWith(typed.base)) score += EXACT_SPELLING / 2
+                typed.kind == InputSyllable.Kind.INITIAL ->
+                    if (SyllablePatterns.isLiteralInitial(typed.base, actual.base)) score += EXACT_SPELLING / 2
                 typed.base == actual.base -> score += EXACT_SPELLING
             }
             if (typed.tone != Syllable.TONE_UNSPECIFIED) {
@@ -160,8 +177,8 @@ class CandidateEngine(
     }
 
     /** The whole input rendered as typed, converting tone digits to marks. */
-    private fun romanCandidate(raw: String, segmentation: List<InputSyllable>): Candidate {
-        fun render(system: RomanSystem) = buildString {
+    private fun romanCandidate(raw: String, segmentation: List<InputSyllable>?): Candidate {
+        fun render(system: RomanSystem) = if (segmentation == null) raw else buildString {
             for ((i, s) in segmentation.withIndex()) {
                 if (i > 0) append(s.boundary.text)
                 if (s.kind == InputSyllable.Kind.COMPLETE) {
@@ -171,7 +188,7 @@ class CandidateEngine(
                 }
             }
         }
-        val numeric = segmentation.joinToString("-") { if (it.kind == InputSyllable.Kind.COMPLETE) it.toSyllable().toNumeric() else it.raw }
+        val numeric = segmentation?.joinToString("-") { if (it.kind == InputSyllable.Kind.COMPLETE) it.toSyllable().toNumeric() else it.raw } ?: raw
         return Candidate(
             hanlo = null,
             hanloPoj = null,
@@ -209,5 +226,10 @@ class CandidateEngine(
             "tng2-lai5" to "轉來", "tng2-khi3" to "轉去", "kue3-lai5" to "過來", "kue3-khi3" to "過去",
             "e5" to "的", "ah4" to "矣", "tioh8" to "著", "leh4" to "咧", "tit4" to "得",
         )
+        private const val PATTERN_LIMIT = 12
+        private const val PATTERN_FETCH = 4 * PATTERN_LIMIT
+        private const val ABBREVIATION_PENALTY = 3_000
+        private const val WILDCARD_PENALTY = 1_000
+        private const val PARTIAL_PATTERN_DIVISOR = 10
     }
 }

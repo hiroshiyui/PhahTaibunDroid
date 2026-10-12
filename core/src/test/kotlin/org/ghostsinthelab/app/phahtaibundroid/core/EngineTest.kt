@@ -39,7 +39,8 @@ class EngineTest {
         LexiconEntry("ah", null, "ah4", 3),
         LexiconEntry("你", null, "li2", 6),
         LexiconEntry("好", null, "ho2", 6),
-        LexiconEntry("感謝", null, "kam2-sia7", 6),
+        LexiconEntry("感謝", null, "kam2-sia7", 7),
+        LexiconEntry("大細", null, "tua7-se3", 4),
     )
     private val lexicon = Lexicon(entries)
     private val engine = CandidateEngine(lexicon)
@@ -211,6 +212,72 @@ class EngineTest {
         assertEquals("tsiah8-pa2--ah4", top.numeric)
         // Without the user's `--`, no guessed compounds.
         assertTrue(engine.candidates("tsiahpaah").none { it.hanlo == "食飽矣" })
+    }
+
+    @Test
+    fun abbreviatesSyllablesToInitials() {
+        assertEquals("台語", top("tg").hanlo)
+        assertEquals("Tâi-gí", top("tg").tailo)
+        assertEquals(2, top("tg").consumed)
+        assertEquals("感謝", top("ks").hanlo)
+        assertEquals("感謝", top("kms").hanlo) // initial plus coda
+        assertEquals("台語", top("tgi").hanlo) // mixed with a spelled syllable
+        assertEquals("台語", top("t-g").hanlo)
+        assertEquals("台語", top("t5g2").hanlo)
+        assertEquals("tg", engine.candidates("tg").first { it.hanlo == null }.tailo)
+    }
+
+    @Test
+    fun abbreviationInitialsAreCoarse() {
+        // `t` covers t/th/ts/tsh; POJ `ch` (= ts) is typed `c`, which excludes plain t.
+        assertTrue(engine.candidates("ts").any { it.hanlo == "大細" })
+        assertTrue(engine.candidates("ds").any { it.hanlo == "大細" })
+        assertTrue(engine.candidates("cs").none { it.hanlo == "大細" })
+        // A lone initial is too vague to look up.
+        assertTrue(engine.candidates("tgx").none { it.hanlo == "台" })
+    }
+
+    @Test
+    fun abbreviationsRankBelowSpelledWords() {
+        val candidates = engine.candidates("ts")
+        assertEquals("水", candidates.first().hanlo) // `ts` as a partially typed tsui
+        assertTrue(candidates.indexOfFirst { it.hanlo == "大細" } > candidates.indexOfFirst { it.hanlo == "水" })
+    }
+
+    @Test
+    fun composerSelectsAbbreviationsPieceByPiece() {
+        val composer = Composer(engine)
+        "tgks".forEach(composer::type)
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "台語" }))
+        assertEquals("ks", composer.rawInput)
+        assertEquals("台語感謝", composer.select(composer.candidates.indexOfFirst { it.hanlo == "感謝" }))
+    }
+
+    @Test
+    fun wildcardMatchesPartOfASyllable() {
+        assertEquals("講", top("k?ng").hanlo)
+        assertEquals("水", top("ch?").hanlo) // POJ ch = ts
+        assertEquals("水", top("?ui").hanlo)
+        assertEquals("講", top("ko?ng").hanlo) // `?` may match nothing
+        assertTrue(engine.candidates("k?v").none { it.hanlo != null })
+        // Spelled-out matches rank above wildcard ones.
+        assertTrue(top("kong").score > engine.candidates("k?ng").first { it.hanlo == "講" }.score)
+    }
+
+    @Test
+    fun wildcardStandsForAWholeSyllable() {
+        assertEquals("台語", top("tai-?").hanlo)
+        assertEquals("台語", top("?-gi2").hanlo)
+        assertEquals("講", top("kong?").hanlo) // `?` may match nothing…
+        assertTrue(engine.candidates("kong?").any { it.hanlo == "講話" }) // …or a syllable of its own
+    }
+
+    @Test
+    fun composerKeepsWildcardAfterSelectingAPiece() {
+        val composer = Composer(engine)
+        "tai-?".forEach(composer::type)
+        assertNull(composer.select(composer.candidates.indexOfFirst { it.hanlo == "台" }))
+        assertEquals("?", composer.rawInput)
     }
 
     @Test

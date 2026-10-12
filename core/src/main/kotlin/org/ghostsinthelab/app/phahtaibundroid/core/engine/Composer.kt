@@ -71,7 +71,7 @@ class Composer(
         val candidate = candidates.getOrNull(index) ?: return null
         history.record(candidate.hanlo, candidate.numeric)
         var end = candidate.consumed
-        while (end < raw.length && !raw[end].isLetterOrDigit()) end++
+        while (end < raw.length && !raw[end].isLetterOrDigit() && raw[end] != SyllablePatterns.WILDCARD) end++
         selections += Selection(candidate, raw.substring(0, end))
         raw.delete(0, end)
         if (raw.isEmpty()) return finish()

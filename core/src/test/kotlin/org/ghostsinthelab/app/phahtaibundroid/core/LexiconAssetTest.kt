@@ -76,6 +76,33 @@ class LexiconAssetTest {
     }
 
     @Test
+    fun abbreviatedInput() {
+        assertTopContains("tg", "台語")
+        assertTopContains("tgi", "台語", within = 1)
+        assertTopContains("lh", "你好")
+        assertTopContains("kms", "感謝", within = 12)
+        assertTopContains("ks", "見笑")
+    }
+
+    @Test
+    fun wildcardInput() {
+        assertTopContains("s?ah", "煞")
+        assertTopContains("tai-?", "臺灣")
+        assertTopContains("?-gi", "台語", within = 12)
+    }
+
+    @Test
+    fun patternInputIsFast() {
+        for (raw in listOf("tg", "kms", "lhkms", "tgkslhtgkslh", "s?ah", "tai-?", "?-?", "?ah", "gua?iutaioan?anggongbekongtaigi")) {
+            val start = System.nanoTime()
+            repeat(10) { engine.candidates(raw) }
+            val perCall = (System.nanoTime() - start) / 10 / 1_000_000
+            println("$raw: $perCall ms per lookup → ${engine.candidates(raw).take(5).map { it.hanlo ?: it.tailo }}")
+            assertTrue("$raw too slow: $perCall ms", perCall < 200)
+        }
+    }
+
+    @Test
     fun longInputIsFast() {
         val start = System.nanoTime()
         repeat(20) { engine.candidates("guasiutaioanlanggongbekongtaigi") }

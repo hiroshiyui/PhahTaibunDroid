@@ -27,6 +27,7 @@ import org.ghostsinthelab.app.phahtaibundroid.core.engine.CandidateEngine
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.Composer
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.FrequencyHistory
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
+import org.ghostsinthelab.app.phahtaibundroid.core.engine.SyllablePatterns
 import org.ghostsinthelab.app.phahtaibundroid.core.engine.UserHistory
 import org.ghostsinthelab.app.phahtaibundroid.ime.ui.KeyboardScreen
 import org.ghostsinthelab.app.phahtaibundroid.settings.AppLanguage
@@ -182,16 +183,20 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             }
             is KeyAction.Digit ->
                 // Digits right after a syllable are tone numbers; otherwise they're just digits.
-                if (composer != null && composer.rawInput.lastOrNull()?.isLetter() == true) {
+                if (composer != null && composer.rawInput.lastOrNull()?.let { it.isLetter() || it == SyllablePatterns.WILDCARD } == true) {
                     composer.type(action.char)
                 } else {
                     finishComposition()
                     commit(action.char.toString())
                 }
-            is KeyAction.Symbol -> {
-                finishComposition()
-                commit(if (state.mode == OutputMode.HANLO) FULL_WIDTH[action.text] ?: action.text else action.text)
-            }
+            is KeyAction.Symbol ->
+                // While composing, `?` is a wildcard for unsure letters (`s?ah`), not punctuation.
+                if (action.text == SyllablePatterns.WILDCARD.toString() && composer != null && composer.rawInput.isNotEmpty()) {
+                    composer.type(SyllablePatterns.WILDCARD)
+                } else {
+                    finishComposition()
+                    commit(if (state.mode == OutputMode.HANLO) FULL_WIDTH[action.text] ?: action.text else action.text)
+                }
             is KeyAction.SelectCandidate -> composer?.select(action.index)?.let(::commit)
             KeyAction.Separator ->
                 if (composer != null && composer.rawInput.isNotEmpty()) composer.type('-') else commit("-")

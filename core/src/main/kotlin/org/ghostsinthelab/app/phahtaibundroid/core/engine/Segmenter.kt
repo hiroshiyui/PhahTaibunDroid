@@ -10,7 +10,7 @@ import org.ghostsinthelab.app.phahtaibundroid.core.romanization.Syllable
  *
  * @property rawStart Offset of the piece in the raw buffer.
  * @property rawEnd Offset just past the piece, including a trailing tone digit and separators.
- * @property base Canonical Tâi-lô base (meaningful only if [kind] is not [Kind.UNKNOWN]).
+ * @property base Canonical Tâi-lô base; for [Kind.UNKNOWN], [Kind.INITIAL] and [Kind.WILDCARD], the lowercased raw text.
  * @property loose [base] collapsed under the active fuzzy rules.
  */
 data class InputSyllable(
@@ -32,6 +32,12 @@ data class InputSyllable(
 
         /** Letters that could not be segmented into known syllables. */
         UNKNOWN,
+
+        /** An abbreviated syllable: its initial's first letter, maybe with its coda (see [SyllablePatterns]). */
+        INITIAL,
+
+        /** A syllable spelled with `?` for unknown letters (see [SyllablePatterns]). */
+        WILDCARD,
     }
 
     fun toSyllable(): Syllable = Syllable(
@@ -48,7 +54,10 @@ data class InputSyllable(
  * Digits are tone numbers and end a syllable; `-` and `'` are explicit separators (`--` marks
  * a neutral tone). Unseparated letter runs are segmented against the lexicon's syllable inventory,
  * yielding several alternative segmentations ranked fewest-syllables first (e.g. `tai|gi` before
- * `ta|i|gi`).
+ * `ta|i|gi`). `?` is a wildcard within a syllable (`s?ah`).
+ *
+ * A run that cannot be segmented, or that has no vowels at all (`tg`, `ks`), is also read as
+ * abbreviated syllables ([InputSyllable.Kind.INITIAL]), possibly mixed with full ones (`tgi`).
  */
 class Segmenter(private val lexicon: Lexicon) {
 
@@ -63,7 +72,14 @@ class Segmenter(private val lexicon: Lexicon) {
                 !raw.endsWith('-') && !raw.endsWith('\'')
             val options = segmentRun(run, allowPartial = isFinal)
             combined = combined.flatMap { prefix -> options.map { prefix + it } }
-                .sortedWith(compareBy({ s -> s.count { it.kind == InputSyllable.Kind.UNKNOWN } }, { it.size }, ::awkwardJoins))
+                .sortedWith(
+                    compareBy(
+                        { s -> s.count { it.kind == InputSyllable.Kind.UNKNOWN } },
+                        { s -> s.count { it.kind == InputSyllable.Kind.INITIAL } },
+                        { it.size },
+                        ::awkwardJoins,
+                    )
+                )
                 .take(maxResults)
         }
         return combined
@@ -102,6 +118,18 @@ class Segmenter(private val lexicon: Lexicon) {
 
     private fun segmentRun(run: Run, allowPartial: Boolean): List<List<InputSyllable>> {
         val t = run.text.lowercase()
+        val spelled = segmentRun(run, t, allowPartial, abbreviate = false)
+        val abbreviated = if (spelled.isEmpty() || (t.length > 1 && t.all { it in CONSONANTS })) {
+            segmentRun(run, t, allowPartial, abbreviate = true)
+        } else {
+            emptyList()
+        }
+        // Unsegmentable letters stay available as such, for the romanization candidate.
+        val unknown = if (spelled.isEmpty()) listOf(listOf(piece(run, 0, t.length, InputSyllable.Kind.UNKNOWN))) else emptyList()
+        return spelled + abbreviated + unknown
+    }
+
+    private fun segmentRun(run: Run, t: String, allowPartial: Boolean, abbreviate: Boolean): List<List<InputSyllable>> {
         val n = t.length
         // Precompute every valid piece [i, j) and whether position i can reach the end.
         val pieces = Array(n) { ArrayList<Pair<Int, InputSyllable.Kind>>() }
@@ -109,12 +137,14 @@ class Segmenter(private val lexicon: Lexicon) {
         for (i in n - 1 downTo 0) {
             for (j in minOf(n, i + MAX_SYLLABLE_LENGTH) downTo i + 1) {
                 if (!reachable[j]) continue
-                val kind = classify(t.substring(i, j), partialAllowed = allowPartial && j == n) ?: continue
+                val s = t.substring(i, j)
+                val kind = (if (abbreviate) classifyAbbreviation(s) else null)
+                    ?: classify(s, partialAllowed = allowPartial && j == n) ?: continue
                 pieces[i] += j to kind
                 reachable[i] = true
             }
         }
-        if (!reachable[0]) return listOf(listOf(piece(run, 0, n, InputSyllable.Kind.UNKNOWN)))
+        if (!reachable[0]) return emptyList()
 
         val results = ArrayList<List<InputSyllable>>()
         fun dfs(i: Int, acc: MutableList<InputSyllable>) {
@@ -131,12 +161,24 @@ class Segmenter(private val lexicon: Lexicon) {
         }
         dfs(0, ArrayList())
         return results.sortedWith(
-            compareBy({ it.size }, ::awkwardJoins, { s -> s.count { it.kind == InputSyllable.Kind.PARTIAL } })
+            compareBy(
+                { s -> s.count { it.kind == InputSyllable.Kind.INITIAL } },
+                { it.size },
+                ::awkwardJoins,
+                { s -> s.count { it.kind == InputSyllable.Kind.PARTIAL } },
+            )
         )
     }
 
+    /** [InputSyllable.Kind.INITIAL] if [s] (consonants only) can abbreviate a syllable. */
+    private fun classifyAbbreviation(s: String): InputSyllable.Kind? =
+        if (s.all { it in CONSONANTS } && SyllablePatterns.abbreviation(lexicon, s) != null) InputSyllable.Kind.INITIAL else null
+
     /** Returns how [s] can be used as a syllable, or `null` if it cannot. */
     private fun classify(s: String, partialAllowed: Boolean): InputSyllable.Kind? {
+        if (SyllablePatterns.WILDCARD in s) {
+            return if (SyllablePatterns.wildcard(lexicon, s) != null) InputSyllable.Kind.WILDCARD else null
+        }
         val parsed = parseTyped(s)
         if (parsed != null && lexicon.isSyllable(lexicon.loosen(parsed.base))) return InputSyllable.Kind.COMPLETE
         if (partialAllowed && partialVariants(s).any { lexicon.hasSyllablePrefix(lexicon.loosen(it)) }) {
@@ -153,7 +195,7 @@ class Segmenter(private val lexicon: Lexicon) {
             InputSyllable.Kind.COMPLETE -> parsed!!.base
             InputSyllable.Kind.PARTIAL -> partialVariants(raw.lowercase())
                 .firstOrNull { lexicon.hasSyllablePrefix(lexicon.loosen(it)) } ?: raw.lowercase()
-            InputSyllable.Kind.UNKNOWN -> raw.lowercase()
+            InputSyllable.Kind.UNKNOWN, InputSyllable.Kind.INITIAL, InputSyllable.Kind.WILDCARD -> raw.lowercase()
         }
         return InputSyllable(
             raw = raw,
@@ -174,6 +216,7 @@ class Segmenter(private val lexicon: Lexicon) {
         private fun parseTyped(s: String) = Romanization.parseSyllable(Romanization.respellPinyinInitial(s))
 
         private const val VOWELS = "aeiou"
+        private const val CONSONANTS = "bcdfghjklmnpqrstvwxyz"
 
         /**
          * Number of vowel-initial syllables right after a consonant-final one. Of equally long
@@ -185,7 +228,8 @@ class Segmenter(private val lexicon: Lexicon) {
             }
 
         /** Letters, plus combining marks so pre-marked input like `lí hó` or `o͘` stays in one run. */
-        private fun Char.isRunChar() = isLetter() || Character.getType(this) == Character.NON_SPACING_MARK.toInt()
+        private fun Char.isRunChar() =
+            isLetter() || this == SyllablePatterns.WILDCARD || Character.getType(this) == Character.NON_SPACING_MARK.toInt()
         private const val MAX_SYLLABLE_LENGTH = 8
 
         /**
