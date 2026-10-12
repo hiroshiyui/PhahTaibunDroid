@@ -1,16 +1,15 @@
 package org.ghostsinthelab.app.phahtaibundroid
 
-import android.app.LocaleManager
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.LocaleList
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -51,11 +50,19 @@ import org.ghostsinthelab.app.phahtaibundroid.core.engine.OutputMode
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.FuzzyRule
 import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 import org.ghostsinthelab.app.phahtaibundroid.ime.PhahTaibunInputMethodService
+import org.ghostsinthelab.app.phahtaibundroid.settings.AppLanguage
 import org.ghostsinthelab.app.phahtaibundroid.settings.ImePreferences
 import org.ghostsinthelab.app.phahtaibundroid.ui.theme.PhahTaibunTheme
 
 /** Setup and settings screen; also the IME's settings activity (see `res/xml/method.xml`). */
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        // Android 13+ applies the per-app language itself; older releases need it applied here.
+        super.attachBaseContext(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) newBase else AppLanguage.wrap(newBase)
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -107,7 +114,7 @@ private fun SettingsScreen(prefs: ImePreferences) {
             SetupSection()
             HorizontalDivider()
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) LanguageSection()
+            LanguageSection()
 
             Section(R.string.settings_roman_system, R.string.settings_roman_system_desc)
             Choice(R.string.settings_poj, system == RomanSystem.POJ) {
@@ -188,17 +195,19 @@ private val LANGUAGES = listOf(
 
 /**
  * Per-app UI language. System settings only list languages Android itself supports, which leaves
- * out Taigi (`nan`), so the choice is offered here too. Changing it recreates the activity.
+ * out Taigi (`nan`), and Android 12 and lower have no per-app language at all, so the choice is
+ * offered here. Changing it recreates the activity.
  */
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun LanguageSection() {
-    val localeManager = LocalContext.current.getSystemService(LocaleManager::class.java)
-    val current = localeManager.applicationLocales.toLanguageTags()
+    val context = LocalContext.current
+    val current = AppLanguage.get(context)
     Section(R.string.settings_language, R.string.settings_language_desc)
     for ((tag, label) in LANGUAGES) {
         Choice(label, current == tag) {
-            localeManager.applicationLocales = LocaleList.forLanguageTags(tag)
+            AppLanguage.set(context, tag)
+            // Android 13+ recreates activities itself after a per-app language change.
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) (context as? Activity)?.recreate()
         }
     }
 }

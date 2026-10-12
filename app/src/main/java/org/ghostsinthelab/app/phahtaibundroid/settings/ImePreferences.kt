@@ -8,7 +8,7 @@ import org.ghostsinthelab.app.phahtaibundroid.core.romanization.RomanSystem
 
 /** User settings shared by the settings screen and the IME service. */
 class ImePreferences(context: Context) {
-    private val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
 
     var romanSystem: RomanSystem
         get() = enumOrNull<RomanSystem>(prefs.getString(KEY_ROMAN_SYSTEM, null)) ?: RomanSystem.TAILO
@@ -28,9 +28,12 @@ class ImePreferences(context: Context) {
     private inline fun <reified T : Enum<T>> enumOrNull(name: String?): T? =
         enumValues<T>().firstOrNull { it.name == name }
 
-    private companion object {
-        const val KEY_ROMAN_SYSTEM = "roman_system"
-        const val KEY_OUTPUT_MODE = "output_mode"
-        const val KEY_FUZZY_RULES = "fuzzy_rules"
+    companion object {
+        /** Shared preferences file, also used by [AppLanguage] on Android 12 and lower. */
+        const val NAME = "settings"
+
+        private const val KEY_ROMAN_SYSTEM = "roman_system"
+        private const val KEY_OUTPUT_MODE = "output_mode"
+        private const val KEY_FUZZY_RULES = "fuzzy_rules"
     }
 }
