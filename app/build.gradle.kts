@@ -72,10 +72,11 @@ base {
     archivesName = "${android.defaultConfig.applicationId}_v${android.defaultConfig.versionName}"
 }
 
-val appBuildFile = file("build.gradle.kts")
-
 tasks.register("bumpPatchVersion") {
     description = "Increment versionCode and versionName patch level"
+    // A local, not a script-level val: the action must not capture the build script object,
+    // which the configuration cache cannot store.
+    val appBuildFile = file("build.gradle.kts")
     doLast {
         var content = appBuildFile.readText()
 
