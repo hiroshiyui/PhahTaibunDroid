@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-13
+
+### Changed
+
+- Settings are grouped into tabs: General (setup, language, romanization, default output), Fuzzy matching, Try it and About; the selected tab is kept across a language change.
+- The About text is shown at body size and links to the source code, the license, and the dictionary sources and their licenses.
+- The app name is written with tone marks, Phah Tâi-bûn Droid, in the app, README, NOTICE, privacy policy and F-Droid metadata.
+
 ## [0.1.1] - 2026-10-13
 
 ### Fixed
@@ -49,6 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Cloud backup is disabled: settings and word history are no longer included in Google Drive backups (device-to-device transfer still works).
 - Project renamed to Phah Taibun Droid to avoid a naming conflict with [rime-phah-taibun](https://github.com/soanseng/rime-phah-taibun). The application ID is now `org.ghostsinthelab.app.phahtaibundroid`; test installs under the old ID must be uninstalled separately.
 
-[Unreleased]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.1...HEAD
+[Unreleased]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.2...HEAD
+[0.1.2]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/hiroshiyui/PhahTaibunDroid/releases/tag/0.1.0

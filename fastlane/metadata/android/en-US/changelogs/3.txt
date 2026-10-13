@@ -1,0 +1,5 @@
+My settings got tidier, and my name got its tones.
+
+* Settings are now grouped into tabs: General, Fuzzy matching, Try it and About.
+* The About page is easier to read and links to my source code, license and dictionary sources.
+* I now write my name properly: Phah Tâi-bûn Droid.
