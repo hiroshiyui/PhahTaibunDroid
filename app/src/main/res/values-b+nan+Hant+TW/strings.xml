@@ -1,7 +1,7 @@
 <resources>
     <!-- Taigi (台語) in Hàn-lô, following the MOE recommended characters (教育部推薦用字). -->
     <string name="app_name">拍台文</string>
-    <string name="ime_name">拍台文 Phah Taibun Droid</string>
+    <string name="ime_name">拍台文 Phah Tâi-bûn Droid</string>
     <string name="subtype_taigi">台語（白話字／台羅）</string>
 
     <string name="keyboard_loading">辭典當咧載入…</string>

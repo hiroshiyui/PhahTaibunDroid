@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Phah Taibun Droid</string>
-    <string name="ime_name">Phah Taibun Droid 拍台文</string>
+    <string name="app_name">Phah Tâi-bûn Droid</string>
+    <string name="ime_name">Phah Tâi-bûn Droid 拍台文</string>
     <string name="subtype_taigi">Taigi (POJ / Tâi-lô)</string>
 
     <string name="keyboard_loading">Loading dictionary…</string>
@@ -23,8 +23,8 @@
     <string name="settings_intro">A Taigi keyboard that understands both POJ (Pe̍h-ōe-jī) and Tâi-lô. Type without tone marks — they are filled in for you — and switch between Hàn-lô and romanization at any time.</string>
     <string name="settings_tab_general">General</string>
     <string name="settings_setup">Setup</string>
-    <string name="settings_enable">1. Enable Phah Taibun Droid</string>
-    <string name="settings_select">2. Switch to Phah Taibun Droid</string>
+    <string name="settings_enable">1. Enable Phah Tâi-bûn Droid</string>
+    <string name="settings_select">2. Switch to Phah Tâi-bûn Droid</string>
     <string name="settings_done">Done</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_desc">Language of this app\'s screens and keyboard labels. Taigi is only offered here, as system settings list only languages Android itself supports.</string>

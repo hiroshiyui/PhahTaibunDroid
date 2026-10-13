@@ -2,7 +2,7 @@
 >
 >**⚠️ 早期預覽：** 本專案仍在積極開發階段，目前尚不適合日常輸入使用。功能、行為與辭典內容都可能隨時變動。預覽版本可從 [GitHub Releases](https://github.com/hiroshiyui/PhahTaibunDroid/releases) 取得。
 
-# Phah Taibun Droid 拍台文
+# Phah Tâi-bûn Droid 拍台文
 
 [![CI](https://github.com/hiroshiyui/PhahTaibunDroid/actions/workflows/ci.yml/badge.svg)](https://github.com/hiroshiyui/PhahTaibunDroid/actions/workflows/ci.yml)
 
@@ -45,7 +45,7 @@ An Android software keyboard (input method editor) for [Taigi](https://en.wikipe
 
 ## Usage 使用
 
-After installing, open **Phah Taibun Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, which fuzzy-matching rules to use, and the app's language: English, Traditional Chinese or Taigi in Hàn-lô (Taigi is only offered there, since Android's own settings list only languages the system supports).
+After installing, open **Phah Tâi-bûn Droid** from the launcher and follow the two setup steps: enable the keyboard in system settings, then switch to it. The same screen lets you choose POJ or Tâi-lô, the default output, which fuzzy-matching rules to use, and the app's language: English, Traditional Chinese or Taigi in Hàn-lô (Taigi is only offered there, since Android's own settings list only languages the system supports).
 
 安裝後，請從桌面開啟「拍台文」，依照畫面上的兩個步驟操作：先在系統設定中啟用本鍵盤，再切換為目前使用的鍵盤。同一個畫面也可以選擇白話字或台羅、預設輸出方式、要使用的模糊比對規則，以及介面語言：英文、繁體中文或台語漢羅。台語只能在這裡選擇，因為 Android 系統設定只列出系統本身支援的語言。
 

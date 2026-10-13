@@ -1,8 +1,8 @@
 # Privacy Policy 隱私權政策
 
-Phah Taibun Droid (拍台文) is a free and open-source Taigi keyboard by YOU, Hui-Hong. This policy describes what the app does with your data. In short: **nothing you type ever leaves your device.**
+Phah Tâi-bûn Droid (拍台文) is a free and open-source Taigi keyboard by YOU, Hui-Hong. This policy describes what the app does with your data. In short: **nothing you type ever leaves your device.**
 
-拍台文（Phah Taibun Droid）是由 YOU, Hui-Hong 開發的自由開源台語鍵盤。本政策說明本程式如何處理您的資料。簡而言之：**您輸入的任何內容都不會離開您的裝置。**
+拍台文（Phah Tâi-bûn Droid）是由 YOU, Hui-Hong 開發的自由開源台語鍵盤。本政策說明本程式如何處理您的資料。簡而言之：**您輸入的任何內容都不會離開您的裝置。**
 
 ## No data collection 不收集任何資料
 

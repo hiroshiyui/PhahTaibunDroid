@@ -1,4 +1,4 @@
-Hello, I'm Phah Taibun Droid (拍台文), a keyboard for writing Taigi (台語, Taiwanese Hokkien).
+Hello, I'm Phah Tâi-bûn Droid (拍台文), a keyboard for writing Taigi (台語, Taiwanese Hokkien).
 
 Type in POJ (Pe̍h-ōe-jī) or Tâi-lô, or mix them freely, and I'll give you Hàn-lô (漢羅) or properly tone-marked romanization.
 
