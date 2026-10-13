@@ -1,5 +1,7 @@
 package org.ghostsinthelab.app.phahtaibundroid.ime
 
+import android.content.res.Configuration
+import android.graphics.Color
 import android.inputmethodservice.InputMethodService
 import android.os.Build
 import android.os.LocaleList
@@ -9,6 +11,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -84,6 +88,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
 
     override fun onCreate() {
         super.onCreate()
+        drawEdgeToEdge()
         savedStateController.performRestore(null)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         prefs = ImePreferences(this)
@@ -100,6 +105,7 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
             decor.setViewTreeLifecycleOwner(this)
             decor.setViewTreeSavedStateRegistryOwner(this)
         }
+        matchNavigationBarButtons()
         viewLocales = AppLanguage.locales(this)
         return ComposeView(AppLanguage.wrap(this)).apply {
             setContent {
@@ -108,6 +114,26 @@ class PhahTaibunInputMethodService : InputMethodService(), LifecycleOwner, Saved
                 }
             }
         }
+    }
+
+    /**
+     * Draws the keyboard behind the navigation bar, as Android 15+ enforces anyway, so it looks the
+     * same on older versions; `KeyboardScreen` pads its keys clear of the bars.
+     */
+    @Suppress("DEPRECATION") // navigationBarColor: needed below Android 15, ignored from then on.
+    private fun drawEdgeToEdge() {
+        val w = window.window ?: return
+        WindowCompat.setDecorFitsSystemWindows(w, false)
+        w.navigationBarColor = Color.TRANSPARENT
+        // The keyboard background already sets the bar's buttons apart; no scrim on top of it.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) w.isNavigationBarContrastEnforced = false
+    }
+
+    /** Dark navigation bar buttons on a light keyboard; redone when the input view is rebuilt for a new configuration. */
+    private fun matchNavigationBarButtons() {
+        val w = window.window ?: return
+        val night = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        WindowInsetsControllerCompat(w, w.decorView).isAppearanceLightNavigationBars = !night
     }
 
     override fun onStartInputView(info: EditorInfo, restarting: Boolean) {

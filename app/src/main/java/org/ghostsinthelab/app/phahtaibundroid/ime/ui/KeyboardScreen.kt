@@ -16,12 +16,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.captionBar
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -73,11 +78,22 @@ private val TONE_HINTS = listOf("1" to "a", "2" to "á", "3" to "à", "4" to "ah
 
 @Composable
 fun KeyboardScreen(state: KeyboardState, onKey: (KeyAction) -> Unit) {
+    // The system's IME navigation bar (back/switcher buttons) is reported to the IME as captionBar
+    // insets and is taller than the gesture-navigation inset; stay clear of both, and of a display
+    // cutout at the side in landscape.
+    val insets = WindowInsets.navigationBars.union(WindowInsets.captionBar).union(WindowInsets.displayCutout)
+        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
+    // Before Android 15 the insets arrive after the first layout, which sized the keyboard window
+    // without them; the view's measure cache would then keep that height and squeeze out the
+    // bottom row. Remeasuring the host view lets the window grow by the padding.
+    val view = LocalView.current
+    val bottomInset = insets.getBottom(LocalDensity.current)
+    LaunchedEffect(bottomInset) { view.requestLayout() }
     Column(
         Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .windowInsetsPadding(WindowInsets.navigationBars)
+            .windowInsetsPadding(insets)
             .padding(horizontal = 3.dp, vertical = 4.dp)
     ) {
         if (!state.directInput) CandidateArea(state, onKey)
@@ -216,10 +232,15 @@ private fun SymbolKeys(state: KeyboardState, onKey: (KeyAction) -> Unit) {
 
 @Composable
 private fun BottomRow(state: KeyboardState, onKey: (KeyAction) -> Unit, layerLabel: String, @StringRes layerDescription: Int) {
-    // A system-provided IME navigation bar (it gives the IME window captionBar insets) already
-    // draws its own IME switcher, so only offer ours when that bar is absent, or when the system
-    // explicitly asks for a custom one.
-    val systemDrawsSwitcher = WindowInsets.captionBar.getBottom(LocalDensity.current) > 0
+    // While a keyboard is up, the system navigation bar shows an IME switcher of its own: in its
+    // IME navigation bar (which gives the IME window captionBar insets) on Android 15+, otherwise
+    // in the navigation bar itself, with 3-button or gesture navigation. So only offer ours when
+    // there is no such bar (hardware buttons, a hidden bar), or when the system explicitly asks.
+    val density = LocalDensity.current
+    val direction = LocalLayoutDirection.current
+    val bars = WindowInsets.navigationBars.union(WindowInsets.captionBar)
+    val systemDrawsSwitcher = bars.getBottom(density) > 0 ||
+        bars.getLeft(density, direction) > 0 || bars.getRight(density, direction) > 0
     val showSwitchKey = state.customSwitcherRequested || (state.offerSwitchKey && !systemDrawsSwitcher)
     KeyRow {
         Key(layerLabel, weight = 1.5f, function = true, description = stringResource(layerDescription)) {
