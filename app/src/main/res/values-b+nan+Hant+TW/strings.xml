@@ -21,6 +21,7 @@
     <string name="key_done">完成</string>
 
     <string name="settings_intro">仝時支援白話字（POJ）佮台羅的台語鍵盤。免拍聲調符號，會自動共你補起來；隨時攏會當佇漢羅佮羅馬字之間切換。</string>
+    <string name="settings_tab_general">一般</string>
     <string name="settings_setup">設定</string>
     <string name="settings_enable">1. 啟用拍台文</string>
     <string name="settings_select">2. 切換做拍台文</string>
@@ -57,5 +58,5 @@
     <string name="fuzzy_j_l">腔口：j ⇄ l（ji̍t／li̍t）</string>
     <string name="settings_try">試看覓</string>
     <string name="settings_about">關於</string>
-    <string name="settings_about_text">這个軟體用 GNU 通用公共授權條款第 3 版抑是後來的任何版本（GPL-3.0-or-later）授權。\n\n辭典資料來自 ChhoeTaigi 計畫：台文華文線頂辭典（鄭良偉、楊允言佮志工，CC BY-SA 4.0）佮 iTaigi 華台對照典（CC0）。</string>
+    <string name="settings_about_text"><![CDATA[這个軟體用 <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU 通用公共授權條款第 3 版</a>抑是後來的任何版本（GPL-3.0-or-later）授權。<br>原始碼：<a href="https://github.com/hiroshiyui/PhahTaibunDroid">github.com/hiroshiyui/PhahTaibunDroid</a><br><br>辭典資料來自 <a href="https://github.com/ChhoeTaigi/ChhoeTaigiDatabase">ChhoeTaigi</a> 計畫：<a href="http://ip194097.ntcu.edu.tw/ungian/soannteng/chil/Taihoa.asp">台文華文線頂辭典</a>（鄭良偉、楊允言佮志工，<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh_TW">CC BY-SA 4.0</a>）佮 <a href="https://itaigi.tw/">iTaigi</a> 華台對照典（<a href="https://creativecommons.org/publicdomain/zero/1.0/deed.zh_TW">CC0</a>）。]]></string>
 </resources>

@@ -29,12 +29,15 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +45,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -94,11 +102,21 @@ private val FUZZY_LABELS = mapOf(
     FuzzyRule.J_L to (R.string.fuzzy_j_l to R.string.fuzzy_j_l),
 )
 
+/** Settings tabs, in order. */
+private enum class SettingsTab(@StringRes val label: Int) {
+    GENERAL(R.string.settings_tab_general),
+    FUZZY(R.string.settings_fuzzy),
+    TRY(R.string.settings_try),
+    ABOUT(R.string.settings_about),
+}
+
 @Composable
 private fun SettingsScreen(prefs: ImePreferences) {
     var system by remember { mutableStateOf(prefs.romanSystem) }
     var mode by remember { mutableStateOf(prefs.outputMode) }
     var rules by remember { mutableStateOf(prefs.fuzzyRules) }
+    // Saveable: a language change recreates the activity, which should stay on the same tab.
+    var tab by rememberSaveable { mutableStateOf(SettingsTab.GENERAL) }
 
     Scaffold(Modifier.fillMaxSize()) { padding ->
         Column(
@@ -108,60 +126,96 @@ private fun SettingsScreen(prefs: ImePreferences) {
                 // ourselves so a focused field (the "Try it" box) can be scrolled above the keyboard.
                 .consumeWindowInsets(padding)
                 .imePadding()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(stringResource(R.string.ime_name), style = MaterialTheme.typography.headlineMedium)
-            Text(stringResource(R.string.settings_intro), style = MaterialTheme.typography.bodyMedium)
-
-            SetupSection()
-            HorizontalDivider()
-
-            LanguageSection()
-
-            Section(R.string.settings_roman_system, R.string.settings_roman_system_desc)
-            Choice(R.string.settings_poj, system == RomanSystem.POJ) {
-                system = RomanSystem.POJ; prefs.romanSystem = system
-            }
-            Choice(R.string.settings_tailo, system == RomanSystem.TAILO) {
-                system = RomanSystem.TAILO; prefs.romanSystem = system
-            }
-
-            Section(R.string.settings_output_mode, R.string.settings_output_mode_desc)
-            Choice(R.string.settings_hanlo, mode == OutputMode.HANLO) {
-                mode = OutputMode.HANLO; prefs.outputMode = mode
-            }
-            Choice(R.string.settings_roman, mode == OutputMode.ROMAN) {
-                mode = OutputMode.ROMAN; prefs.outputMode = mode
-            }
-
-            Section(R.string.settings_fuzzy, R.string.settings_fuzzy_desc)
-            for (rule in FuzzyRule.entries) {
-                val checked = rule in rules
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .toggleable(checked, role = Role.Checkbox) {
-                            rules = if (it) rules + rule else rules - rule
-                            prefs.fuzzyRules = rules
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Checkbox(checked = checked, onCheckedChange = null)
-                    val (poj, tailo) = FUZZY_LABELS.getValue(rule)
-                    Text(stringResource(if (system == RomanSystem.POJ) poj else tailo), Modifier.padding(start = 12.dp))
+            Text(
+                stringResource(R.string.ime_name),
+                Modifier.padding(16.dp),
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            PrimaryScrollableTabRow(selectedTabIndex = tab.ordinal, edgePadding = 16.dp) {
+                for (t in SettingsTab.entries) {
+                    Tab(selected = tab == t, onClick = { tab = t }, text = { Text(stringResource(t.label)) })
                 }
             }
+            Column(
+                Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                when (tab) {
+                    SettingsTab.GENERAL -> {
+                        Text(stringResource(R.string.settings_intro), style = MaterialTheme.typography.bodyMedium)
 
-            HorizontalDivider()
-            Text(stringResource(R.string.settings_try), style = MaterialTheme.typography.titleMedium)
-            var sample by remember { mutableStateOf("") }
-            OutlinedTextField(sample, { sample = it }, Modifier.fillMaxWidth(), minLines = 2)
+                        SetupSection()
+                        HorizontalDivider()
 
-            HorizontalDivider()
-            Text(stringResource(R.string.settings_about), style = MaterialTheme.typography.titleMedium)
-            Text(stringResource(R.string.settings_about_text), style = MaterialTheme.typography.bodySmall)
+                        LanguageSection()
+
+                        Section(R.string.settings_roman_system, R.string.settings_roman_system_desc)
+                        Choice(R.string.settings_poj, system == RomanSystem.POJ) {
+                            system = RomanSystem.POJ; prefs.romanSystem = system
+                        }
+                        Choice(R.string.settings_tailo, system == RomanSystem.TAILO) {
+                            system = RomanSystem.TAILO; prefs.romanSystem = system
+                        }
+
+                        Section(R.string.settings_output_mode, R.string.settings_output_mode_desc)
+                        Choice(R.string.settings_hanlo, mode == OutputMode.HANLO) {
+                            mode = OutputMode.HANLO; prefs.outputMode = mode
+                        }
+                        Choice(R.string.settings_roman, mode == OutputMode.ROMAN) {
+                            mode = OutputMode.ROMAN; prefs.outputMode = mode
+                        }
+                    }
+
+                    SettingsTab.FUZZY -> {
+                        Text(
+                            stringResource(R.string.settings_fuzzy_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        for (rule in FuzzyRule.entries) {
+                            val checked = rule in rules
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .toggleable(checked, role = Role.Checkbox) {
+                                        rules = if (it) rules + rule else rules - rule
+                                        prefs.fuzzyRules = rules
+                                    },
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Checkbox(checked = checked, onCheckedChange = null)
+                                val (poj, tailo) = FUZZY_LABELS.getValue(rule)
+                                Text(
+                                    stringResource(if (system == RomanSystem.POJ) poj else tailo),
+                                    Modifier.padding(start = 12.dp),
+                                )
+                            }
+                        }
+                    }
+
+                    SettingsTab.TRY -> {
+                        var sample by rememberSaveable { mutableStateOf("") }
+                        OutlinedTextField(sample, { sample = it }, Modifier.fillMaxWidth(), minLines = 4)
+                    }
+
+                    SettingsTab.ABOUT -> {
+                        // HTML (kept as CDATA in the resources) so the sources and licenses are links.
+                        val about = stringResource(R.string.settings_about_text)
+                        val linkColor = MaterialTheme.colorScheme.primary
+                        val text = remember(about, linkColor) {
+                            AnnotatedString.fromHtml(
+                                about,
+                                TextLinkStyles(SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline)),
+                            )
+                        }
+                        Text(text, style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
         }
     }
 }

@@ -21,6 +21,7 @@
     <string name="key_done">Done</string>
 
     <string name="settings_intro">A Taigi keyboard that understands both POJ (Pe̍h-ōe-jī) and Tâi-lô. Type without tone marks — they are filled in for you — and switch between Hàn-lô and romanization at any time.</string>
+    <string name="settings_tab_general">General</string>
     <string name="settings_setup">Setup</string>
     <string name="settings_enable">1. Enable Phah Taibun Droid</string>
     <string name="settings_select">2. Switch to Phah Taibun Droid</string>
@@ -61,5 +62,5 @@
     <string name="fuzzy_j_l">Accent: j ⇄ l (ji̍t / li̍t)</string>
     <string name="settings_try">Try it</string>
     <string name="settings_about">About</string>
-    <string name="settings_about_text">Licensed under the GNU General Public License v3.0 or later.\n\nDictionary data from the ChhoeTaigi project: 台文華文線頂辭典 (Tēⁿ Liông-úi, Iûⁿ Ún-giân and volunteers, CC BY-SA 4.0) and iTaigi 華台對照典 (CC0).</string>
+    <string name="settings_about_text"><![CDATA[Licensed under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0</a> or later.<br>Source code: <a href="https://github.com/hiroshiyui/PhahTaibunDroid">github.com/hiroshiyui/PhahTaibunDroid</a><br><br>Dictionary data from the <a href="https://github.com/ChhoeTaigi/ChhoeTaigiDatabase">ChhoeTaigi</a> project: <a href="http://ip194097.ntcu.edu.tw/ungian/soannteng/chil/Taihoa.asp">台文華文線頂辭典</a> (Tēⁿ Liông-úi, Iûⁿ Ún-giân and volunteers, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>) and <a href="https://itaigi.tw/">iTaigi</a> 華台對照典 (<a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>).]]></string>
 </resources>
