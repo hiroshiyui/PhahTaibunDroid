@@ -1,0 +1,5 @@
+A small fix-up release for how I sit on your screen.
+
+* My bottom row no longer hides under the navigation bar or the system's keyboard buttons.
+* On Android 14 and older I now reach to the bottom edge, with no black strip under the keys.
+* No more duplicate keyboard-switch key when the navigation bar already shows one.

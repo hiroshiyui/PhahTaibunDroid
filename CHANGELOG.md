@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-13
+
+### Fixed
+
+- The keyboard's bottom row was covered by the system's IME navigation bar (hide and switcher buttons) on Android 15+ with gesture navigation.
+- The keyboard is drawn edge-to-edge on Android 14 and older too, behind a transparent navigation bar with buttons matching the theme, instead of above a black strip.
+- The keyboard's own input-method switch key no longer duplicates the switcher in the system navigation bar (3-button navigation, or gesture navigation before Android 15).
+
 ## [0.1.0] - 2026-10-13
 
 ### Added
@@ -41,5 +49,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Cloud backup is disabled: settings and word history are no longer included in Google Drive backups (device-to-device transfer still works).
 - Project renamed to Phah Taibun Droid to avoid a naming conflict with [rime-phah-taibun](https://github.com/soanseng/rime-phah-taibun). The application ID is now `org.ghostsinthelab.app.phahtaibundroid`; test installs under the old ID must be uninstalled separately.
 
-[Unreleased]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.1...HEAD
+[0.1.1]: https://github.com/hiroshiyui/PhahTaibunDroid/compare/0.1.0...0.1.1
 [0.1.0]: https://github.com/hiroshiyui/PhahTaibunDroid/releases/tag/0.1.0
